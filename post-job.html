@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Job - City Maid</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .job-form {
+            max-width: 800px;
+            margin: 100px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .optional {
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <h1>City Maid</h1>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="find-maids.html">Find Maids</a>
+            <a href="find-jobs.html">Find Jobs</a>
+            <a href="create-profile.html">Create Profile</a>
+            <a href="post-job.html" class="active">Post a Job</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="about.html">About Us</a>
+            <a href="signin.html" class="auth-btn">Sign In</a>
+        </div>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Post Job Form -->
+    <main>
+        <div class="job-form">
+            <h2>Post a Job</h2>
+            <form id="postJobForm" onsubmit="return handleJobSubmit(event)">
+                <div class="form-group">
+                    <label for="ownerName">Your Name</label>
+                    <input type="text" id="ownerName" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Services Needed</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cooking" value="cooking">
+                            <label for="cooking">Cooking</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cleaning" value="cleaning">
+                            <label for="cleaning">Cleaning</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="laundry" value="laundry">
+                            <label for="laundry">Laundry</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="childcare" value="childcare">
+                            <label for="childcare">Childcare</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="elderly" value="elderly">
+                            <label for="elderly">Elderly Care</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="officeCleaning" value="officeCleaning">
+                            <label for="officeCleaning">Office Cleaning</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="gardening" value="gardening">
+                            <label for="gardening">Gardening</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="shopping" value="shopping">
+                            <label for="shopping">Shopping</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="postnatalMassage" value="postnatalMassage">
+                            <label for="postnatalMassage">Postnatal Massage</label>
+                        </div>
+                    </div>
+                    <small class="hint">Please select at least one service</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Work Location</label>
+                    <input type="text" id="location" placeholder="e.g., Sanepa, Kalanki, Baneshwor" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="workingHours">Working Hours</label>
+                    <input type="text" id="workingHours" placeholder="e.g., 9am to 5pm" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="salary">Salary Offered (NPR per month)</label>
+                    <input type="number" id="salary" min="5000" placeholder="Minimum 5000 NPR" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="frequency">Frequency Needed</label>
+                    <select id="frequency" required>
+                        <option value="">Select frequency</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="once-a-week">Once a Week</option>
+                        <option value="twice-a-week">Twice a Week</option>
+                    </select>
+                    <small class="hint">How often you need the service</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Contact Number</label>
+                    <input type="tel" id="phone" placeholder="Enter your phone number" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Enter your email address" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="additionalInfo">Additional Information <span class="optional">(Optional)</span></label>
+                    <textarea id="additionalInfo" placeholder="Any specific requirements or preferences..."></textarea>
+                </div>
+
+                <button type="submit" class="btn primary">Post Job</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>City Maid</h3>
+                <p>Connecting trusted domestic help with employers in Nepal</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="find-maids.html">Find Maids</a></li>
+                    <li><a href="find-jobs.html">Find Jobs</a></li>
+                    <li><a href="create-profile.html">Create Profile</a></li>
+                    <li><a href="post-job.html">Post a Job</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@citymaid.com</p>
+                <p>Phone: +977-1-4XXXXXX</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 City Maid. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Handle form submission
+        function handleJobSubmit(event) {
+            event.preventDefault();
+
+            // Get selected services
+            const services = [];
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                services.push(checkbox.value);
+            });
+
+            // Create job object
+            const job = {
+                id: generateId(),
+                ownerName: document.getElementById('ownerName').value,
+                services: services,
+                location: document.getElementById('location').value,
+                workingHours: document.getElementById('workingHours').value,
+                salary: document.getElementById('salary').value,
+                frequency: document.getElementById('frequency').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                additionalInfo: document.getElementById('additionalInfo').value,
+                postedDate: new Date().toISOString()
+            };
+
+            // Save to local storage
+            const jobs = JSON.parse(localStorage.getItem(STORAGE_KEYS.JOBS) || '[]');
+            jobs.push(job);
+            localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(jobs));
+
+            alert('Job posted successfully!');
+            window.location.href = 'find-jobs.html';
+            return false;
+        }
+    </script>
+</body>
+</html> 

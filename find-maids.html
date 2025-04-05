@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Maids - City Maid</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .filters {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+        }
+
+        .maids-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .maid-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .maid-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .maid-photo {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .maid-info {
+            padding: 1.5rem;
+        }
+
+        .maid-info h3 {
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .maid-info p {
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .services-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .service-tag {
+            background: var(--light-gray);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <h1>City Maid</h1>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="find-maids.html" class="active">Find Maids</a>
+            <a href="find-jobs.html">Find Jobs</a>
+            <a href="create-profile.html">Create Profile</a>
+            <a href="post-job.html">Post a Job</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="about.html">About Us</a>
+            <a href="signin.html" class="auth-btn">Sign In</a>
+        </div>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <div class="filters">
+            <div class="filter-group">
+                <label for="locationFilter">Location</label>
+                <select id="locationFilter" onchange="filterMaids()">
+                    <option value="">All Locations</option>
+                    <option value="Sanepa">Sanepa</option>
+                    <option value="Kalanki">Kalanki</option>
+                    <option value="Baneshwor">Baneshwor</option>
+                    <option value="Maitighar">Maitighar</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="workTypeFilter">Work Type</label>
+                <select id="workTypeFilter" onchange="filterMaids()">
+                    <option value="">All Types</option>
+                    <option value="part-time">Part Time</option>
+                    <option value="full-time">Full Time</option>
+                    <option value="home-stay">Home Stay</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="serviceFilter">Service</label>
+                <select id="serviceFilter" onchange="filterMaids()">
+                    <option value="">All Services</option>
+                    <option value="cooking">Cooking</option>
+                    <option value="cleaning">Cleaning</option>
+                    <option value="laundry">Laundry</option>
+                    <option value="childcare">Childcare</option>
+                    <option value="elderly">Elderly Care</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="salaryFilter">Maximum Salary (NPR)</label>
+                <input type="number" id="salaryFilter" min="0" onchange="filterMaids()">
+            </div>
+        </div>
+
+        <div class="maids-grid" id="maidsGrid">
+            <!-- Maids will be dynamically loaded here -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>City Maid</h3>
+                <p>Connecting trusted domestic help with employers in Nepal</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="find-maids.html">Find Maids</a></li>
+                    <li><a href="find-jobs.html">Find Jobs</a></li>
+                    <li><a href="create-profile.html">Create Profile</a></li>
+                    <li><a href="post-job.html">Post a Job</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@citymaid.com</p>
+                <p>Phone: +977-1-4XXXXXX</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 City Maid. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Load and display maids
+        function loadMaids(filters = {}) {
+            const maidsGrid = document.getElementById('maidsGrid');
+            const maids = JSON.parse(localStorage.getItem(STORAGE_KEYS.MAIDS) || '[]');
+
+            // Apply filters
+            let filteredMaids = maids.filter(maid => {
+                if (filters.location && maid.location !== filters.location) return false;
+                if (filters.workType && maid.workType !== filters.workType) return false;
+                if (filters.service && !maid.services.includes(filters.service)) return false;
+                if (filters.maxSalary && parseInt(maid.expectedSalary) > filters.maxSalary) return false;
+                return true;
+            });
+
+            if (filteredMaids.length === 0) {
+                maidsGrid.innerHTML = '<div class="no-results">No maids found matching your criteria</div>';
+                return;
+            }
+
+            maidsGrid.innerHTML = filteredMaids.map(maid => `
+                <div class="maid-card">
+                    <img src="${maid.photo || 'images/default-avatar.jpg'}" alt="${maid.name}" class="maid-photo">
+                    <div class="maid-info">
+                        <h3>${maid.name}</h3>
+                        <p><strong>Age:</strong> ${maid.age}</p>
+                        <p><strong>Location:</strong> ${maid.location}</p>
+                        <p><strong>Work Type:</strong> ${maid.workType}</p>
+                        <p><strong>Expected Salary:</strong> NPR ${maid.expectedSalary}</p>
+                        <div class="services-list">
+                            ${maid.services.map(service => `
+                                <span class="service-tag">${service}</span>
+                            `).join('')}
+                        </div>
+                        <button class="btn primary" onclick="unlockContact('maid', '${maid.id}')">View Contact</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter maids based on selected criteria
+        function filterMaids() {
+            const filters = {
+                location: document.getElementById('locationFilter').value,
+                workType: document.getElementById('workTypeFilter').value,
+                service: document.getElementById('serviceFilter').value,
+                maxSalary: document.getElementById('salaryFilter').value
+            };
+            loadMaids(filters);
+        }
+
+        // Load maids when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMaids();
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - City Maid</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-color);
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: -2px;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1rem;
+            color: #666;
+        }
+
+        .auth-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #dc3545;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <h1>City Maid</h1>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="find-maids.html">Find Maids</a>
+            <a href="find-jobs.html">Find Jobs</a>
+            <a href="create-profile.html">Create Profile</a>
+            <a href="post-job.html">Post a Job</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="about.html">About Us</a>
+            <a href="signin.html" class="auth-btn active">Sign In</a>
+        </div>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Auth Container -->
+    <main>
+        <div class="auth-container">
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchTab('signin')">Sign In</div>
+                <div class="auth-tab" onclick="switchTab('signup')">Sign Up</div>
+            </div>
+
+            <!-- Sign In Form -->
+            <form id="signinForm" class="auth-form active" onsubmit="return handleSignIn(event)">
+                <div class="form-group">
+                    <label for="signinEmail">Email</label>
+                    <input type="email" id="signinEmail" required>
+                    <div class="error-message" id="signinEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signinPassword">Password</label>
+                    <input type="password" id="signinPassword" required>
+                    <div class="error-message" id="signinPasswordError"></div>
+                </div>
+
+                <button type="submit" class="btn primary" style="width: 100%">Sign In</button>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form id="signupForm" class="auth-form" onsubmit="return handleSignUp(event)">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" required>
+                    <div class="error-message" id="signupNameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required>
+                    <div class="error-message" id="signupEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required>
+                    <div class="error-message" id="signupPasswordError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupConfirmPassword">Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" required>
+                    <div class="error-message" id="signupConfirmPasswordError"></div>
+                </div>
+
+                <button type="submit" class="btn primary" style="width: 100%">Sign Up</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>City Maid</h3>
+                <p>Connecting trusted domestic help with employers in Nepal</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="find-maids.html">Find Maids</a></li>
+                    <li><a href="find-jobs.html">Find Jobs</a></li>
+                    <li><a href="create-profile.html">Create Profile</a></li>
+                    <li><a href="post-job.html">Post a Job</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@citymaid.com</p>
+                <p>Phone: +977-1-4XXXXXX</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 City Maid. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Switch between sign in and sign up forms
+        function switchTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            document.querySelector(`.auth-tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`${tab}Form`).classList.add('active');
+        }
+
+        // Handle sign in
+        function handleSignIn(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('signinEmail').value;
+            const password = document.getElementById('signinPassword').value;
+
+            // Get users from local storage
+            const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                // Store current user in local storage
+                localStorage.setItem('currentUser', JSON.stringify({
+                    id: user.id,
+                    name: user.name,
+                    email: user.email
+                }));
+
+                // Redirect to home page
+                window.location.href = 'index.html';
+            } else {
+                document.getElementById('signinEmailError').textContent = 'Invalid email or password';
+                document.getElementById('signinEmailError').style.display = 'block';
+            }
+
+            return false;
+        }
+
+        // Handle sign up
+        function handleSignUp(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+
+            // Reset error messages
+            document.querySelectorAll('.error-message').forEach(e => {
+                e.textContent = '';
+                e.style.display = 'none';
+            });
+
+            // Validate password match
+            if (password !== confirmPassword) {
+                document.getElementById('signupConfirmPasswordError').textContent = 'Passwords do not match';
+                document.getElementById('signupConfirmPasswordError').style.display = 'block';
+                return false;
+            }
+
+            // Get existing users
+            const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+
+            // Check if email already exists
+            if (users.some(u => u.email === email)) {
+                document.getElementById('signupEmailError').textContent = 'Email already registered';
+                document.getElementById('signupEmailError').style.display = 'block';
+                return false;
+            }
+
+            // Create new user
+            const newUser = {
+                id: generateId(),
+                name,
+                email,
+                password
+            };
+
+            // Add to users array
+            users.push(newUser);
+            localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+
+            // Store current user
+            localStorage.setItem('currentUser', JSON.stringify({
+                id: newUser.id,
+                name: newUser.name,
+                email: newUser.email
+            }));
+
+            // Redirect to home page
+            window.location.href = 'index.html';
+            return false;
+        }
+
+        // Check if user is already signed in
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html> 

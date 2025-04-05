@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Profile - City Maid</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .profile-form {
+            max-width: 800px;
+            margin: 100px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .photo-upload {
+            border: 2px dashed var(--border-color);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        .photo-upload:hover {
+            border-color: var(--primary-color);
+        }
+
+        .photo-preview {
+            max-width: 200px;
+            margin: 1rem auto;
+            display: none;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <h1>City Maid</h1>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="find-maids.html">Find Maids</a>
+            <a href="find-jobs.html">Find Jobs</a>
+            <a href="create-profile.html" class="active">Create Profile</a>
+            <a href="post-job.html">Post a Job</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="about.html">About Us</a>
+            <a href="signin.html" class="auth-btn">Sign In</a>
+        </div>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Create Profile Form -->
+    <main>
+        <div class="profile-form">
+            <h2>Create Your Profile</h2>
+            <form id="createProfileForm" onsubmit="return handleProfileSubmit(event)">
+                <div class="form-group">
+                    <label for="photo">Profile Photo</label>
+                    <div class="photo-upload" onclick="document.getElementById('photo').click()">
+                        <i class="fas fa-camera"></i>
+                        <p>Click to upload photo</p>
+                    </div>
+                    <input type="file" id="photo" accept="image/*" style="display: none" onchange="handlePhotoUpload(event)">
+                    <div class="photo-preview" id="photoPreview">
+                        <img src="" alt="Preview">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" min="18" max="65" placeholder="Must be between 18-65 years" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="religion">Religion</label>
+                    <select id="religion" required>
+                        <option value="">Select your religion</option>
+                        <option value="Hindu">Hindu</option>
+                        <option value="Buddhist">Buddhist</option>
+                        <option value="Christian">Christian</option>
+                        <option value="Muslim">Muslim</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Preferred Working Location</label>
+                    <input type="text" id="location" placeholder="e.g., Sanepa, Kalanki, Baneshwor" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="workingTime">Preferred Working Time</label>
+                    <input type="text" id="workingTime" placeholder="e.g., 9am to 5pm" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="expectedSalary">Expected Salary (NPR per month)</label>
+                    <input type="number" id="expectedSalary" min="5000" placeholder="Minimum 5000 NPR" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Services Offered</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cooking" value="cooking" required>
+                            <label for="cooking">Cooking</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cleaning" value="cleaning">
+                            <label for="cleaning">Cleaning</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="laundry" value="laundry">
+                            <label for="laundry">Laundry</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="childcare" value="childcare">
+                            <label for="childcare">Childcare</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="elderly" value="elderly">
+                            <label for="elderly">Elderly Care</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="officeCleaning" value="officeCleaning">
+                            <label for="officeCleaning">Office Cleaning</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="gardening" value="gardening">
+                            <label for="gardening">Gardening</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="shopping" value="shopping">
+                            <label for="shopping">Shopping</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="postnatalMassage" value="postnatalMassage">
+                            <label for="postnatalMassage">Postnatal Massage</label>
+                        </div>
+                    </div>
+                    <small class="hint">Please select at least one service</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Contact Number</label>
+                    <input type="tel" id="phone" placeholder="Enter your phone number" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Enter your email address" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="workType">Willing to work as Home Stay / 24 Hours?</label>
+                    <select id="workType" required>
+                        <option value="">Select your preference</option>
+                        <option value="home-stay">Yes - Willing for Home Stay</option>
+                        <option value="part-time">No - Prefer Part Time Only</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="availableFrom">Available From</label>
+                    <input type="date" id="availableFrom" required>
+                    <small class="hint">Select the date you can start working</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="additionalInfo">Additional Information <span class="optional">(Optional)</span></label>
+                    <textarea id="additionalInfo" placeholder="Share any additional information about your experience, skills, or preferences..."></textarea>
+                </div>
+
+                <button type="submit" class="btn primary">Create Profile</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>City Maid</h3>
+                <p>Connecting trusted domestic help with employers in Nepal</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="find-maids.html">Find Maids</a></li>
+                    <li><a href="find-jobs.html">Find Jobs</a></li>
+                    <li><a href="create-profile.html">Create Profile</a></li>
+                    <li><a href="post-job.html">Post a Job</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@citymaid.com</p>
+                <p>Phone: +977-1-4XXXXXX</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 City Maid. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Handle photo upload and preview
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('photoPreview');
+                    preview.style.display = 'block';
+                    preview.querySelector('img').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Handle form submission
+        function handleProfileSubmit(event) {
+            event.preventDefault();
+
+            // Get selected services
+            const services = [];
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                services.push(checkbox.value);
+            });
+
+            // Create profile object
+            const profile = {
+                id: generateId(),
+                photo: document.getElementById('photoPreview').querySelector('img').src,
+                name: document.getElementById('name').value,
+                age: document.getElementById('age').value,
+                religion: document.getElementById('religion').value,
+                location: document.getElementById('location').value,
+                workingTime: document.getElementById('workingTime').value,
+                expectedSalary: document.getElementById('expectedSalary').value,
+                workType: document.getElementById('workType').value,
+                services: services,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                availableFrom: document.getElementById('availableFrom').value
+            };
+
+            // Save to local storage
+            const maids = JSON.parse(localStorage.getItem(STORAGE_KEYS.MAIDS) || '[]');
+            maids.push(profile);
+            localStorage.setItem(STORAGE_KEYS.MAIDS, JSON.stringify(maids));
+
+            alert('Profile created successfully!');
+            window.location.href = 'find-maids.html';
+            return false;
+        }
+    </script>
+</body>
+</html> 
