@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - CityMaid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card {
+            @apply bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300;
+        }
+        .stat-card {
+            @apply p-6 rounded-xl relative overflow-hidden;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.1;
+        }
+        .contact-card {
+            @apply bg-white rounded-lg p-4 flex items-center justify-between border border-gray-100 hover:border-indigo-200 transition-all duration-300;
+        }
+        .btn-primary {
+            @apply bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-300;
+        }
+        .btn-secondary {
+            @apply bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-colors duration-300;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="text-xl font-bold text-indigo-600">CityMaid</div>
+                <div class="flex items-center space-x-4">
+                    <button id="notificationBtn" class="p-2 text-gray-500 hover:text-indigo-600">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <div class="relative" id="userDropdown">
+                        <button class="flex items-center space-x-2 text-gray-700 hover:text-indigo-600">
+                            <img id="userAvatar" src="https://via.placeholder.com/32" class="w-8 h-8 rounded-full">
+                            <span id="userName">Loading...</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Welcome Banner -->
+        <div class="gradient-bg rounded-2xl p-8 mb-8 text-white">
+            <h1 class="text-3xl font-bold mb-2">Welcome to Your Dashboard</h1>
+            <p class="opacity-90">Manage your contacts and track your payments in one place</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="stat-card text-white">
+                <h3 class="text-lg opacity-90 mb-2">Unlocked Contacts</h3>
+                <div class="text-3xl font-bold" id="unlockedContactsCount">0</div>
+                <div class="text-sm opacity-75 mt-2">Available for communication</div>
+            </div>
+            <div class="stat-card text-white">
+                <h3 class="text-lg opacity-90 mb-2">Total Spent</h3>
+                <div class="text-3xl font-bold" id="totalSpent">$0</div>
+                <div class="text-sm opacity-75 mt-2">On contact unlocks</div>
+            </div>
+            <div class="stat-card text-white">
+                <h3 class="text-lg opacity-90 mb-2">Recent Unlocks</h3>
+                <div class="text-3xl font-bold" id="recentUnlocks">0</div>
+                <div class="text-sm opacity-75 mt-2">In the last 30 days</div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Recent Contacts -->
+            <div class="lg:col-span-2">
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-800">Recent Unlocked Contacts</h2>
+                        <button class="btn-secondary text-sm">View All</button>
+                    </div>
+                    <div id="recentContactsList" class="space-y-4">
+                        <!-- Contacts will be loaded here -->
+                        <div class="animate-pulse">
+                            <div class="h-20 bg-gray-100 rounded-lg"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment History -->
+            <div class="lg:col-span-1">
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-800">Recent Payments</h2>
+                        <button class="btn-secondary text-sm">View All</button>
+                    </div>
+                    <div id="paymentsList" class="space-y-4">
+                        <!-- Payments will be loaded here -->
+                        <div class="animate-pulse">
+                            <div class="h-16 bg-gray-100 rounded-lg"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase Client
+        const supabase = window.supabase.createClient(
+            'YOUR_SUPABASE_URL',
+            'YOUR_SUPABASE_ANON_KEY'
+        );
+
+        async function loadDashboardData() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    window.location.href = 'signin.html';
+                    return;
+                }
+
+                // Update user name
+                document.getElementById('userName').textContent = user.email.split('@')[0];
+
+                // Load unlocked contacts
+                const { data: contacts } = await supabase
+                    .from('unlocked_contacts')
+                    .select('*, profiles(*)')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+
+                // Update stats
+                document.getElementById('unlockedContactsCount').textContent = contacts?.length || 0;
+                
+                // Calculate recent unlocks (last 30 days)
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                const recentUnlocksCount = contacts?.filter(c => 
+                    new Date(c.created_at) > thirtyDaysAgo
+                ).length || 0;
+                document.getElementById('recentUnlocks').textContent = recentUnlocksCount;
+
+                // Display recent contacts
+                if (contacts?.length) {
+                    const recentContactsHtml = contacts.slice(0, 5).map(contact => `
+                        <div class="contact-card">
+                            <div class="flex items-center space-x-4">
+                                <img src="${contact.profiles.avatar_url || 'https://via.placeholder.com/40'}" 
+                                     class="w-10 h-10 rounded-full">
+                                <div>
+                                    <div class="font-semibold text-gray-800">${contact.profiles.full_name}</div>
+                                    <div class="text-sm text-gray-500">
+                                        <i class="fas fa-map-marker-alt mr-1"></i>
+                                        ${contact.profiles.location}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <a href="tel:${contact.profiles.phone}" class="text-indigo-600 hover:text-indigo-800">
+                                    <i class="fas fa-phone"></i>
+                                </a>
+                                <a href="mailto:${contact.profiles.email}" class="text-indigo-600 hover:text-indigo-800">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `).join('');
+                    document.getElementById('recentContactsList').innerHTML = recentContactsHtml;
+                } else {
+                    document.getElementById('recentContactsList').innerHTML = `
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-user-friends text-4xl mb-3"></i>
+                            <p>No contacts unlocked yet</p>
+                            <button class="btn-primary mt-4">Find Maids</button>
+                        </div>
+                    `;
+                }
+
+                // Load payment history
+                const { data: payments } = await supabase
+                    .from('payments')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+
+                // Update total spent
+                const totalSpent = payments?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
+                document.getElementById('totalSpent').textContent = `$${totalSpent.toFixed(2)}`;
+
+                // Display recent payments
+                if (payments?.length) {
+                    const paymentsHtml = payments.slice(0, 5).map(payment => `
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-semibold text-gray-800">Contact Unlock</div>
+                                <div class="text-sm text-gray-500">
+                                    ${new Date(payment.created_at).toLocaleDateString()}
+                                </div>
+                            </div>
+                            <div class="text-green-600 font-semibold">$${payment.amount.toFixed(2)}</div>
+                        </div>
+                    `).join('');
+                    document.getElementById('paymentsList').innerHTML = paymentsHtml;
+                } else {
+                    document.getElementById('paymentsList').innerHTML = `
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-credit-card text-4xl mb-3"></i>
+                            <p>No payments yet</p>
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                // Show error message
+                const errorHtml = `
+                    <div class="bg-red-50 text-red-600 p-4 rounded-lg mb-8">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        Error loading dashboard data. Please refresh the page.
+                    </div>
+                `;
+                document.querySelector('.container').insertAdjacentHTML('afterbegin', errorHtml);
+            }
+        }
+
+        // Load dashboard data when page loads
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+</html>

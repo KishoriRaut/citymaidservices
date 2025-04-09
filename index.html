@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CityMaid - Find Reliable Domestic Help</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#4F46E5',
+                            secondary: '#4338CA',
+                            light: '#EEF2FF',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .profile-image {
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            object-position: center 15%;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                       0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+                       0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            position: relative;
+            display: inline-block;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, #4F46E5, #4338CA);
+            border-radius: 2px;
+        }
+
+        .badge {
+            background: linear-gradient(135deg, #4F46E5, #4338CA);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+
+        .truncate-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="font-poppins">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-3xl font-bold text-brand-primary tracking-tight">City<span class="text-brand-secondary">Maid</span></a>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-brand-primary font-semibold">Home</a>
+                    <a href="find-maids.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Find Maids</a>
+                    <a href="find-jobs.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Find Jobs</a>
+                    <a href="create-profile.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Create Profile</a>
+                    <a href="post-job.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Post a Job</a>
+                    <a href="contact.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Contact Us</a>
+                    <a href="about.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">About Us</a>
+                    <div id="authButton">
+                        <a href="signin.html" class="bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary font-semibold transition-colors">Sign In</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-brand-light py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                    Find Trusted Domestic Help in Your Area
+                </h1>
+                <p class="text-lg text-gray-600 mb-8">
+                    Connect with verified domestic helpers for all your household needs. Post jobs or find work opportunities easily.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="create-profile.html" class="bg-brand-primary text-white px-8 py-4 rounded-lg hover:bg-brand-secondary transition-colors text-center font-semibold">
+                        <i class="fas fa-user-plus mr-2"></i>Create Profile
+                    </a>
+                    <a href="post-job.html" class="bg-white text-brand-primary px-8 py-4 rounded-lg hover:bg-gray-50 transition-colors text-center font-semibold border-2 border-brand-primary">
+                        <i class="fas fa-plus mr-2"></i>Post a Job
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Available Maids Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="section-title text-3xl font-bold text-gray-900">
+                    Featured Domestic Helpers
+                </h2>
+                <p class="mt-6 text-lg text-gray-600">
+                    Discover experienced and verified domestic helpers ready to assist you
+                </p>
+            </div>
+            <div id="latestMaidsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Loading placeholder -->
+                <div class="col-span-full flex justify-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-primary"></div>
+                </div>
+            </div>
+            <div id="loadMoreMaids" class="text-center mt-12 hidden">
+                <button onclick="loadMoreMaids()" class="bg-white text-brand-primary px-8 py-3 rounded-lg hover:bg-brand-light transition-colors font-semibold border-2 border-brand-primary">
+                    <i class="fas fa-sync-alt mr-2"></i>Load More Profiles
+                </button>
+            </div>
+            <div class="text-center mt-8">
+                <a href="find-maids.html" class="inline-block bg-brand-primary text-white px-8 py-3 rounded-lg hover:bg-brand-secondary transition-colors">
+                    Browse All Profiles <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Jobs Section -->
+    <section class="py-16 bg-brand-light">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="section-title text-3xl font-bold text-gray-900">
+                    Recent Job Opportunities
+                </h2>
+                <p class="mt-6 text-lg text-gray-600">
+                    Find your perfect domestic helper position with top employers
+                </p>
+            </div>
+            <div id="latestJobsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Loading placeholder -->
+                <div class="col-span-full flex justify-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-primary"></div>
+                </div>
+            </div>
+            <div id="loadMoreJobs" class="text-center mt-12 hidden">
+                <button onclick="loadMoreJobs()" class="bg-white text-brand-primary px-8 py-3 rounded-lg hover:bg-brand-light transition-colors font-semibold border-2 border-brand-primary">
+                    <i class="fas fa-sync-alt mr-2"></i>Load More Jobs
+                </button>
+            </div>
+            <div class="text-center mt-8">
+                <a href="find-jobs.html" class="inline-block bg-brand-primary text-white px-8 py-3 rounded-lg hover:bg-brand-secondary transition-colors">
+                    View All Jobs <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="section-title text-3xl font-bold text-gray-900">
+                    Why Choose CityMaid
+                </h2>
+                <p class="mt-6 text-lg text-gray-600">
+                    We make finding domestic help simple, secure, and reliable
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center p-6">
+                    <div class="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-check text-2xl text-brand-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Verified Profiles</h3>
+                    <p class="text-gray-600">All domestic helpers are thoroughly verified for your safety</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-bolt text-2xl text-brand-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Quick Matching</h3>
+                    <p class="text-gray-600">Find the perfect match for your requirements quickly</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-2xl text-brand-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Secure Platform</h3>
+                    <p class="text-gray-600">Your data and transactions are always protected</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">CityMaid</h3>
+                    <p class="text-gray-400">Connecting households with reliable domestic help</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="find-maids.html" class="text-gray-400 hover:text-white transition-colors">Find Maids</a></li>
+                        <li><a href="find-jobs.html" class="text-gray-400 hover:text-white transition-colors">Find Jobs</a></li>
+                        <li><a href="post-job.html" class="text-gray-400 hover:text-white transition-colors">Post a Job</a></li>
+                        <li><a href="create-profile.html" class="text-gray-400 hover:text-white transition-colors">Create Profile</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="contact.html" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="about.html" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Connect With Us</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-facebook text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-twitter text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-instagram text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-linkedin text-2xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400">&copy; 2024 CityMaid. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Supabase
+        const supabaseUrl = 'https://fdgqqxyyofjnkhswkwcq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZ3FxeHl5b2Zqbmtoc3drd2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMjQyMTMsImV4cCI6MjA1OTYwMDIxM30.YyJLLu3r2a7Mh7ny0ie-YzzLfPh5PdrJJHnBFBxWqVE';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Global variables for pagination
+        let currentMaidPage = 0;
+        let currentJobPage = 0;
+        const itemsPerPage = 6;
+        let hasMoreMaids = true;
+        let hasMoreJobs = true;
+
+        // Format salary
+        function formatSalary(salary) {
+            if (!salary) return 'Not specified';
+            return new Intl.NumberFormat('en-NP', {
+                style: 'currency',
+                currency: 'NPR',
+                maximumFractionDigits: 0
+            }).format(salary);
+        }
+
+        // Load more maids
+        async function loadMoreMaids() {
+            currentMaidPage++;
+            await loadLatestMaids(true);
+        }
+
+        // Load more jobs
+        async function loadMoreJobs() {
+            currentJobPage++;
+            await loadLatestJobs(true);
+        }
+
+        // Load maids with pagination
+        async function loadLatestMaids(loadMore = false) {
+            const container = document.getElementById('latestMaidsContainer');
+            const loadMoreBtn = document.getElementById('loadMoreMaids');
+            
+            if (!loadMore) {
+                container.innerHTML = `
+                    <div class="col-span-full flex justify-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-primary"></div>
+                    </div>
+                `;
+            }
+
+            try {
+                const { data: maids, error } = await supabase
+                    .from('maids')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: false })
+                    .range(currentMaidPage * itemsPerPage, (currentMaidPage + 1) * itemsPerPage - 1);
+
+                if (error) throw error;
+
+                if (!maids || maids.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <p class="text-gray-500">No profiles available at the moment</p>
+                        </div>
+                    `;
+                    loadMoreBtn.classList.add('hidden');
+                    return;
+                }
+
+                if (maids.length < itemsPerPage) {
+                    hasMoreMaids = false;
+                    loadMoreBtn.classList.add('hidden');
+                } else {
+                    hasMoreMaids = true;
+                    loadMoreBtn.classList.remove('hidden');
+                }
+
+                const maidsHTML = maids.map(maid => `
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                        <div class="relative">
+                            <img src="${maid.profile_image || 'https://placehold.co/300x400/eee/aaa?text=No+Image'}" 
+                                 alt="${maid.full_name}" 
+                                 class="w-full profile-image">
+                            <div class="absolute top-4 right-4">
+                                <span class="badge">
+                                    ${maid.type}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">${maid.full_name}</h3>
+                            <div class="space-y-2 mb-4">
+                                <p class="text-gray-600 flex items-center">
+                                    <i class="fas fa-map-marker-alt text-brand-primary mr-2 w-5"></i>
+                                    ${maid.location}
+                                </p>
+                                <p class="text-gray-600 flex items-center">
+                                    <i class="fas fa-clock text-brand-primary mr-2 w-5"></i>
+                                    ${maid.working_hours || 'Not specified'}
+                                </p>
+                                <p class="text-gray-600 flex items-center">
+                                    <i class="fas fa-star text-brand-primary mr-2 w-5"></i>
+                                    ${maid.experience}
+                                </p>
+                                <p class="text-gray-600 flex items-center">
+                                    <i class="fas fa-money-bill-wave text-brand-primary mr-2 w-5"></i>
+                                    ${formatSalary(maid.expected_salary)}/month
+                                </p>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                ${maid.services.slice(0, 3).map(service => `
+                                    <span class="px-3 py-1 bg-brand-light text-brand-primary rounded-full text-sm">
+                                        ${service}
+                                    </span>
+                                `).join('')}
+                                ${maid.services.length > 3 ? `
+                                    <span class="px-3 py-1 bg-brand-light text-brand-primary rounded-full text-sm">
+                                        +${maid.services.length - 3} more
+                                    </span>
+                                ` : ''}
+                            </div>
+                            <button onclick="window.location.href='find-maids.html'" 
+                                    class="w-full bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary transition-colors">
+                                View Profile
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                if (loadMore) {
+                    container.innerHTML += maidsHTML;
+                } else {
+                    container.innerHTML = maidsHTML;
+                }
+
+            } catch (error) {
+                console.error('Error loading maids:', error);
+                if (!loadMore) {
+                    container.innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <p class="text-gray-500">Error loading profiles. Please try again later.</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Load jobs with pagination
+        async function loadLatestJobs(loadMore = false) {
+            const container = document.getElementById('latestJobsContainer');
+            const loadMoreBtn = document.getElementById('loadMoreJobs');
+            
+            if (!loadMore) {
+                container.innerHTML = `
+                    <div class="col-span-full flex justify-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-primary"></div>
+                    </div>
+                `;
+            }
+
+            try {
+                console.log('Fetching jobs...');
+                const { data: jobs, error } = await supabase
+                    .from('jobs')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: false })
+                    .range(currentJobPage * itemsPerPage, (currentJobPage + 1) * itemsPerPage - 1);
+
+                console.log('Jobs data:', jobs);
+                console.log('Error:', error);
+
+                if (error) throw error;
+
+                if (!jobs || jobs.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <p class="text-gray-500">No jobs available at the moment</p>
+                        </div>
+                    `;
+                    loadMoreBtn.classList.add('hidden');
+                    return;
+                }
+
+                if (jobs.length < itemsPerPage) {
+                    hasMoreJobs = false;
+                    loadMoreBtn.classList.add('hidden');
+                } else {
+                    hasMoreJobs = true;
+                    loadMoreBtn.classList.remove('hidden');
+                }
+
+                const jobsHTML = jobs.map(job => `
+                    <div class="bg-white rounded-xl card-shadow p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900 truncate-2">${job.owner_name}</h3>
+                            <span class="badge ml-2 whitespace-nowrap">
+                                ${job.type}
+                            </span>
+                        </div>
+                        <div class="space-y-3 mb-4">
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-map-marker-alt text-brand-primary mr-2 w-5"></i>
+                                ${job.location}
+                            </p>
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-briefcase text-brand-primary mr-2 w-5"></i>
+                                ${job.required_experience}
+                            </p>
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-clock text-brand-primary mr-2 w-5"></i>
+                                ${job.working_hours}
+                            </p>
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-money-bill-wave text-brand-primary mr-2 w-5"></i>
+                                ${formatSalary(job.salary)}/month
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            ${job.services.slice(0, 3).map(service => `
+                                <span class="px-3 py-1 bg-brand-light text-brand-primary rounded-full text-sm">
+                                    ${service}
+                                </span>
+                            `).join('')}
+                            ${job.services.length > 3 ? `
+                                <span class="px-3 py-1 bg-brand-light text-brand-primary rounded-full text-sm">
+                                    +${job.services.length - 3} more
+                                </span>
+                            ` : ''}
+                        </div>
+                        <p class="text-gray-600 mb-4 truncate-2">${job.description || 'No description available'}</p>
+                        <button onclick="window.location.href='find-jobs.html'" 
+                                class="w-full bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary transition-colors">
+                            View Details
+                        </button>
+                    </div>
+                `).join('');
+
+                if (loadMore) {
+                    container.innerHTML += jobsHTML;
+                } else {
+                    container.innerHTML = jobsHTML;
+                }
+
+            } catch (error) {
+                console.error('Error loading jobs:', error);
+                if (!loadMore) {
+                    container.innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <p class="text-gray-500">Error loading jobs. Please try again later.</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing data...');
+            loadLatestMaids();
+            loadLatestJobs();
+        });
+    </script>
+</body>
+</html>

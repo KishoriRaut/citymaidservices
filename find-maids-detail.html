@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maid Profile - CityMaid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .contact-blur {
+            filter: blur(4px);
+            user-select: none;
+        }
+        .skill-badge {
+            @apply px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800;
+        }
+        .info-card {
+            @apply bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300;
+        }
+        .btn-unlock {
+            @apply w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-medium 
+                   hover:bg-indigo-700 transition-colors duration-300 flex items-center justify-center;
+        }
+        .experience-timeline {
+            @apply border-l-2 border-indigo-200 pl-4 ml-4 space-y-4;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation (reuse existing) -->
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Profile Header -->
+        <div class="profile-header rounded-2xl p-8 text-white mb-8">
+            <div class="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-8">
+                <img id="profileImage" src="https://via.placeholder.com/150" 
+                     class="w-32 h-32 rounded-full border-4 border-white shadow-lg">
+                <div class="flex-1">
+                    <h1 class="text-3xl font-bold mb-2" id="maidName">Loading...</h1>
+                    <div class="flex flex-wrap gap-4 mb-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span id="location">Loading...</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-briefcase mr-2"></i>
+                            <span id="experience">Loading...</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-clock mr-2"></i>
+                            <span id="availability">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2" id="servicesList">
+                        <!-- Services badges will be loaded here -->
+                    </div>
+                </div>
+                <!-- Contact Preview (Blurred) -->
+                <div class="md:text-right space-y-2" id="contactPreview">
+                    <div class="contact-blur text-lg">+1 (XXX) XXX-XXXX</div>
+                    <div class="contact-blur">xxxxx@xxxxx.com</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- About Section -->
+                <div class="info-card">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">About</h2>
+                    <p class="text-gray-600" id="about">Loading...</p>
+                </div>
+
+                <!-- Experience Timeline -->
+                <div class="info-card">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Work Experience</h2>
+                    <div class="experience-timeline" id="experienceTimeline">
+                        <!-- Experience items will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Skills & Services -->
+                <div class="info-card">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Skills & Services</h2>
+                    <div class="grid grid-cols-2 gap-4" id="skillsGrid">
+                        <!-- Skills will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-8">
+                <!-- Unlock Contact Card -->
+                <div class="info-card">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Contact Information</h2>
+                    <div class="text-center p-6 bg-gray-50 rounded-lg mb-6">
+                        <div class="text-2xl font-bold text-indigo-600 mb-2">$9.99</div>
+                        <p class="text-gray-600 mb-6">One-time payment to unlock contact details</p>
+                        <button id="unlockButton" class="btn-unlock">
+                            <i class="fas fa-lock mr-2"></i>
+                            Unlock Contact Details
+                        </button>
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Direct contact information
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Verified profile
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Background checked
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Availability Card -->
+                <div class="info-card">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Availability</h2>
+                    <div class="space-y-3" id="availabilitySchedule">
+                        <!-- Availability schedule will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Verification Status -->
+                <div class="info-card">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Verification Status</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Identity Verified</span>
+                            <i class="fas fa-check-circle text-green-500"></i>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Background Check</span>
+                            <i class="fas fa-check-circle text-green-500"></i>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">References Checked</span>
+                            <i class="fas fa-check-circle text-green-500"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold mb-4">Unlock Contact Details</h2>
+            <!-- Payment form will be injected here -->
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase Client
+        const supabase = window.supabase.createClient(
+            'YOUR_SUPABASE_URL',
+            'YOUR_SUPABASE_ANON_KEY'
+        );
+
+        async function loadMaidProfile() {
+            try {
+                // Get maid ID from URL parameter
+                const urlParams = new URLSearchParams(window.location.search);
+                const maidId = urlParams.get('id');
+
+                if (!maidId) {
+                    throw new Error('No maid ID provided');
+                }
+
+                // Fetch maid profile
+                const { data: maid, error } = await supabase
+                    .from('profiles')
+                    .select(`
+                        *,
+                        experience:work_experience(*),
+                        availability:work_availability(*)
+                    `)
+                    .eq('id', maidId)
+                    .single();
+
+                if (error) throw error;
+
+                // Update UI with maid data
+                document.getElementById('maidName').textContent = maid.full_name;
+                document.getElementById('location').textContent = maid.location;
+                document.getElementById('experience').textContent = `${maid.years_experience}+ years experience`;
+                document.getElementById('availability').textContent = maid.availability_status;
+                document.getElementById('about').textContent = maid.about;
+
+                // Load services
+                const servicesList = maid.services.map(service => 
+                    `<span class="skill-badge">${service}</span>`
+                ).join('');
+                document.getElementById('servicesList').innerHTML = servicesList;
+
+                // Load experience timeline
+                const experienceHtml = maid.experience.map(exp => `
+                    <div class="relative">
+                        <div class="absolute -left-6 mt-1 w-2 h-2 bg-indigo-600 rounded-full"></div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">${exp.employer}</h3>
+                            <p class="text-sm text-gray-500">${exp.duration}</p>
+                            <p class="text-gray-600 mt-1">${exp.description}</p>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('experienceTimeline').innerHTML = experienceHtml;
+
+                // Load availability schedule
+                const scheduleHtml = maid.availability.map(slot => `
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">${slot.day}</span>
+                        <span class="text-gray-800">${slot.hours}</span>
+                    </div>
+                `).join('');
+                document.getElementById('availabilitySchedule').innerHTML = scheduleHtml;
+
+                // Setup payment button
+                document.getElementById('unlockButton').addEventListener('click', () => {
+                    // Show payment modal
+                    document.getElementById('paymentModal').classList.remove('hidden');
+                });
+
+            } catch (error) {
+                console.error('Error loading maid profile:', error);
+                // Show error message
+            }
+        }
+
+        // Load profile when page loads
+        document.addEventListener('DOMContentLoaded', loadMaidProfile);
+    </script>
+</body>
+</html>
