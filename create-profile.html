@@ -3,316 +3,449 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Profile - City Maid</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Create Profile - CityMaid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#4F46E5',
+                            secondary: '#4338CA',
+                            light: '#EEF2FF',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .profile-form {
-            max-width: 800px;
-            margin: 100px auto;
-            padding: 2rem;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-
-        .form-group textarea {
-            height: 100px;
-            resize: vertical;
-        }
-
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 0.5rem;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .photo-upload {
-            border: 2px dashed var(--border-color);
-            padding: 2rem;
-            text-align: center;
-            cursor: pointer;
-            margin-bottom: 1rem;
-        }
-
-        .photo-upload:hover {
-            border-color: var(--primary-color);
-        }
-
-        .photo-preview {
-            max-width: 200px;
-            margin: 1rem auto;
-            display: none;
-        }
-
-        .photo-preview img {
-            width: 100%;
-            height: auto;
-            border-radius: 5px;
+        .profile-image-preview {
+            transition: all 0.3s ease;
         }
     </style>
 </head>
-<body>
+<body class="bg-brand-light font-poppins">
     <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="logo">
-            <h1>City Maid</h1>
-        </div>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="find-maids.html">Find Maids</a>
-            <a href="find-jobs.html">Find Jobs</a>
-            <a href="create-profile.html" class="active">Create Profile</a>
-            <a href="post-job.html">Post a Job</a>
-            <a href="contact.html">Contact Us</a>
-            <a href="about.html">About Us</a>
-            <a href="signin.html" class="auth-btn">Sign In</a>
-        </div>
-        <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-3xl font-bold text-brand-primary tracking-tight">City<span class="text-brand-secondary">Maid</span></a>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Home</a>
+                    <a href="find-maids.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Find Maids</a>
+                    <a href="find-jobs.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Find Jobs</a>
+                    <a href="create-profile.html" class="text-brand-primary font-semibold">Create Profile</a>
+                    <a href="post-job.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Post a Job</a>
+                    <a href="contact.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Contact Us</a>
+                    <a href="about.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">About Us</a>
+                    <div id="authButton">
+                        <a href="signin.html" class="bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary font-semibold transition-colors">Sign In</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <!-- Create Profile Form -->
-    <main>
-        <div class="profile-form">
-            <h2>Create Your Profile</h2>
-            <form id="createProfileForm" onsubmit="return handleProfileSubmit(event)">
-                <div class="form-group">
-                    <label for="photo">Profile Photo</label>
-                    <div class="photo-upload" onclick="document.getElementById('photo').click()">
-                        <i class="fas fa-camera"></i>
-                        <p>Click to upload photo</p>
-                    </div>
-                    <input type="file" id="photo" accept="image/*" style="display: none" onchange="handlePhotoUpload(event)">
-                    <div class="photo-preview" id="photoPreview">
-                        <img src="" alt="Preview">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" placeholder="Enter your full name" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="age">Age</label>
-                    <input type="number" id="age" min="18" max="65" placeholder="Must be between 18-65 years" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="religion">Religion</label>
-                    <select id="religion" required>
-                        <option value="">Select your religion</option>
-                        <option value="Hindu">Hindu</option>
-                        <option value="Buddhist">Buddhist</option>
-                        <option value="Christian">Christian</option>
-                        <option value="Muslim">Muslim</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="location">Preferred Working Location</label>
-                    <input type="text" id="location" placeholder="e.g., Sanepa, Kalanki, Baneshwor" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="workingTime">Preferred Working Time</label>
-                    <input type="text" id="workingTime" placeholder="e.g., 9am to 5pm" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="expectedSalary">Expected Salary (NPR per month)</label>
-                    <input type="number" id="expectedSalary" min="5000" placeholder="Minimum 5000 NPR" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Services Offered</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="cooking" value="cooking" required>
-                            <label for="cooking">Cooking</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="cleaning" value="cleaning">
-                            <label for="cleaning">Cleaning</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="laundry" value="laundry">
-                            <label for="laundry">Laundry</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="childcare" value="childcare">
-                            <label for="childcare">Childcare</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="elderly" value="elderly">
-                            <label for="elderly">Elderly Care</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="officeCleaning" value="officeCleaning">
-                            <label for="officeCleaning">Office Cleaning</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="gardening" value="gardening">
-                            <label for="gardening">Gardening</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="shopping" value="shopping">
-                            <label for="shopping">Shopping</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="postnatalMassage" value="postnatalMassage">
-                            <label for="postnatalMassage">Postnatal Massage</label>
-                        </div>
-                    </div>
-                    <small class="hint">Please select at least one service</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="phone">Contact Number</label>
-                    <input type="tel" id="phone" placeholder="Enter your phone number" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="Enter your email address" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="workType">Willing to work as Home Stay / 24 Hours?</label>
-                    <select id="workType" required>
-                        <option value="">Select your preference</option>
-                        <option value="home-stay">Yes - Willing for Home Stay</option>
-                        <option value="part-time">No - Prefer Part Time Only</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="availableFrom">Available From</label>
-                    <input type="date" id="availableFrom" required>
-                    <small class="hint">Select the date you can start working</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="additionalInfo">Additional Information <span class="optional">(Optional)</span></label>
-                    <textarea id="additionalInfo" placeholder="Share any additional information about your experience, skills, or preferences..."></textarea>
-                </div>
-
-                <button type="submit" class="btn primary">Create Profile</button>
-            </form>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>City Maid</h3>
-                <p>Connecting trusted domestic help with employers in Nepal</p>
+    <!-- Create Profile Form Section -->
+    <section class="py-12" id="createProfileSection">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Create Your Profile</h1>
+                <p class="text-lg text-gray-600">Fill in your details to create your maid profile</p>
             </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="find-maids.html">Find Maids</a></li>
-                    <li><a href="find-jobs.html">Find Jobs</a></li>
-                    <li><a href="create-profile.html">Create Profile</a></li>
-                    <li><a href="post-job.html">Post a Job</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <p>Email: info@citymaid.com</p>
-                <p>Phone: +977-1-4XXXXXX</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 City Maid. All rights reserved.</p>
-        </div>
-    </footer>
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <form id="profileForm" class="space-y-6">
+                        <!-- Profile Image -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Profile Image</label>
+                            <div class="flex items-center space-x-6">
+                                <div class="relative w-32 h-32">
+                                    <img id="profileImagePreview" 
+                                         src="https://placehold.co/400x400/eee/aaa?text=Profile" 
+                                         alt="Profile preview" 
+                                         class="profile-image-preview w-full h-full rounded-full object-cover border-4 border-gray-200">
+                                    <label for="profileImage" class="absolute bottom-0 right-0 bg-brand-primary text-white rounded-full p-2 cursor-pointer shadow-lg hover:bg-brand-secondary transition-colors">
+                                        <i class="fas fa-camera"></i>
+                                    </label>
+                                </div>
+                                <div class="flex-1">
+                                    <input type="file" id="profileImage" name="profileImage" 
+                                           accept="image/*" class="hidden">
+                                    <label for="profileImage" 
+                                           class="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                        <i class="fas fa-cloud-upload-alt mr-2"></i>
+                                        Upload Photo
+                                    </label>
+                                    <p class="mt-2 text-xs text-gray-500">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Recommended: Square image, max 2MB
+                                    </p>
+                                    <p class="mt-1 text-xs text-gray-500">
+                                        <i class="fas fa-check-circle mr-1"></i>
+                                        Supported: JPG, PNG
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
 
-    <script src="js/main.js"></script>
+                        <!-- Personal Information -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="fullName" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                                <input type="text" id="fullName" name="fullName" required
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary"
+                                    placeholder="Enter your full name">
+                            </div>
+                            <div>
+                                <label for="age" class="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                                <input type="number" id="age" name="age" required min="18" max="60"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary"
+                                    placeholder="Enter your age">
+                            </div>
+                        </div>
+
+                        <!-- Work Details -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="location" class="block text-sm font-medium text-gray-700 mb-2">Preferred Location</label>
+                                <input type="text" id="location" name="location" required
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary"
+                                    placeholder="e.g. Kathmandu, Lalitpur">
+                            </div>
+                            <div>
+                                <label for="workType" class="block text-sm font-medium text-gray-700 mb-2">Work Type</label>
+                                <select id="workType" name="workType" required
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
+                                    <option value="">Select Type</option>
+                                    <option value="full-time">Full Time</option>
+                                    <option value="part-time">Part Time</option>
+                                    <option value="live-in">Live In</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="workingHours" class="block text-sm font-medium text-gray-700 mb-2">Preferred Working Hours</label>
+                                <input type="text" id="workingHours" name="workingHours" required
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary"
+                                    placeholder="e.g. 9 AM to 5 PM">
+                            </div>
+                            <div>
+                                <label for="expectedSalary" class="block text-sm font-medium text-gray-700 mb-2">Expected Monthly Salary (NPR)</label>
+                                <input type="number" id="expectedSalary" name="expectedSalary" required min="5000"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary"
+                                    placeholder="Enter expected salary">
+                            </div>
+                            <div>
+                                <label for="experience" class="block text-sm font-medium text-gray-700 mb-2">Experience</label>
+                                <select id="experience" name="experience" required
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
+                                    <option value="">Select Experience</option>
+                                    <option value="0-1 years">0-1 years</option>
+                                    <option value="1-3 years">1-3 years</option>
+                                    <option value="3-5 years">3-5 years</option>
+                                    <option value="5+ years">5+ years</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Services Offered -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-4">Services Offered</label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label class="flex items-center space-x-3">
+                                    <input type="checkbox" name="services" value="cooking"
+                                        class="h-5 w-5 text-brand-primary focus:ring-brand-primary border-gray-300 rounded">
+                                    <span class="text-gray-700"><i class="fas fa-utensils text-brand-primary mr-2"></i>Cooking</span>
+                                </label>
+                                <label class="flex items-center space-x-3">
+                                    <input type="checkbox" name="services" value="cleaning"
+                                        class="h-5 w-5 text-brand-primary focus:ring-brand-primary border-gray-300 rounded">
+                                    <span class="text-gray-700"><i class="fas fa-broom text-brand-primary mr-2"></i>Cleaning</span>
+                                </label>
+                                <label class="flex items-center space-x-3">
+                                    <input type="checkbox" name="services" value="laundry"
+                                        class="h-5 w-5 text-brand-primary focus:ring-brand-primary border-gray-300 rounded">
+                                    <span class="text-gray-700"><i class="fas fa-tshirt text-brand-primary mr-2"></i>Laundry</span>
+                                </label>
+                                <label class="flex items-center space-x-3">
+                                    <input type="checkbox" name="services" value="childcare"
+                                        class="h-5 w-5 text-brand-primary focus:ring-brand-primary border-gray-300 rounded">
+                                    <span class="text-gray-700"><i class="fas fa-baby text-brand-primary mr-2"></i>Childcare</span>
+                                </label>
+                                <label class="flex items-center space-x-3">
+                                    <input type="checkbox" name="services" value="elderly"
+                                        class="h-5 w-5 text-brand-primary focus:ring-brand-primary border-gray-300 rounded">
+                                    <span class="text-gray-700"><i class="fas fa-user-nurse text-brand-primary mr-2"></i>Elderly Care</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div>
+                            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                                Description
+                                <span class="text-gray-500">(<span id="charCount">0</span>/300 characters)</span>
+                            </label>
+                            <textarea id="description" name="description" rows="3" maxlength="300" required
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary"
+                                placeholder="Briefly describe your experience, skills, and preferences..."></textarea>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Contact Phone</label>
+                                <input type="tel" id="phone" name="phone" required
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary"
+                                    placeholder="e.g. +977-98XXXXXXXX">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Contact Email (Optional)</label>
+                                <input type="email" id="email" name="email"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary"
+                                    placeholder="e.g. your@email.com">
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="flex gap-4">
+                            <button type="submit" class="flex-1 bg-brand-primary text-white py-4 px-6 rounded-lg font-semibold hover:bg-brand-secondary transition-colors">
+                                Create Profile
+                            </button>
+                            <button type="reset" class="flex-1 bg-gray-100 text-gray-700 py-4 px-6 rounded-lg font-semibold hover:bg-gray-200 transition-colors border border-gray-300">
+                                Reset Form
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
     <script>
-        // Handle photo upload and preview
-        function handlePhotoUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('photoPreview');
-                    preview.style.display = 'block';
-                    preview.querySelector('img').src = e.target.result;
+        // Initialize Supabase
+        const supabaseUrl = 'https://fdgqqxyyofjnkhswkwcq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZ3FxeHl5b2Zqbmtoc3drd2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMjQyMTMsImV4cCI6MjA1OTYwMDIxM30.YyJLLu3r2a7Mh7ny0ie-YzzLfPh5PdrJJHnBFBxWqVE';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Image Preview Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileImageInput = document.getElementById('profileImage');
+            const profileImagePreview = document.getElementById('profileImagePreview');
+
+            profileImageInput.addEventListener('change', function(e) {
+                const file = this.files[0];
+                
+                if (file) {
+                    // File size validation (2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        alert('File size must be less than 2MB');
+                        this.value = '';
+                        return;
+                    }
+
+                    // File type validation
+                    if (!file.type.match('image.*')) {
+                        alert('Please select an image file (JPG or PNG)');
+                        this.value = '';
+                        return;
+                    }
+
+                    // Create FileReader to read the image
+                    const reader = new FileReader();
+                    
+                    // Show loading state
+                    profileImagePreview.style.opacity = '0.5';
+                    
+                    reader.onload = function(e) {
+                        profileImagePreview.src = e.target.result;
+                        profileImagePreview.style.opacity = '1';
+                        profileImagePreview.classList.remove('border-gray-200');
+                        profileImagePreview.classList.add('border-brand-primary');
+                    };
+
+                    reader.onerror = function() {
+                        alert('Error reading file');
+                        profileImagePreview.src = 'https://placehold.co/400x400/eee/aaa?text=Profile';
+                        this.value = '';
+                    };
+
+                    reader.readAsDataURL(file);
                 }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Handle form submission
-        function handleProfileSubmit(event) {
-            event.preventDefault();
-
-            // Get selected services
-            const services = [];
-            document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
-                services.push(checkbox.value);
             });
+        });
 
-            // Create profile object
-            const profile = {
-                id: generateId(),
-                photo: document.getElementById('photoPreview').querySelector('img').src,
-                name: document.getElementById('name').value,
-                age: document.getElementById('age').value,
-                religion: document.getElementById('religion').value,
-                location: document.getElementById('location').value,
-                workingTime: document.getElementById('workingTime').value,
-                expectedSalary: document.getElementById('expectedSalary').value,
-                workType: document.getElementById('workType').value,
-                services: services,
-                phone: document.getElementById('phone').value,
-                email: document.getElementById('email').value,
-                availableFrom: document.getElementById('availableFrom').value
-            };
+        // Character count for description
+        const descriptionField = document.getElementById('description');
+        const charCountSpan = document.getElementById('charCount');
 
-            // Save to local storage
-            const maids = JSON.parse(localStorage.getItem(STORAGE_KEYS.MAIDS) || '[]');
-            maids.push(profile);
-            localStorage.setItem(STORAGE_KEYS.MAIDS, JSON.stringify(maids));
-
-            alert('Profile created successfully!');
-            window.location.href = 'find-maids.html';
-            return false;
+        function updateCharCount() {
+            charCountSpan.textContent = descriptionField.value.length;
         }
+
+        descriptionField.addEventListener('input', updateCharCount);
+        updateCharCount();
+
+        // Form submission handler
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                // Show loading state
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.innerHTML;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating Profile...';
+
+                // Get selected services
+                const services = Array.from(document.querySelectorAll('input[name="services"]:checked'))
+                    .map(checkbox => checkbox.value);
+
+                // Validate services
+                if (services.length === 0) {
+                    throw new Error('Please select at least one service');
+                }
+
+                // Handle image upload first
+                const imageFile = document.getElementById('profileImage').files[0];
+                let imageUrl = null;
+
+                if (imageFile) {
+                    try {
+                        // Create a unique file name
+                        const fileExt = imageFile.name.split('.').pop();
+                        const fileName = `${Date.now()}.${fileExt}`;
+
+                        console.log('Attempting to upload file:', fileName);
+
+                        // Upload the file
+                        const { data, error } = await supabase.storage
+                            .from('profile-images')
+                            .upload(fileName, imageFile);
+
+                        if (error) {
+                            console.error('Upload error:', error);
+                            throw error;
+                        }
+
+                        console.log('Upload successful:', data);
+
+                        // Get the public URL
+                        imageUrl = `${supabaseUrl}/storage/v1/object/public/profile-images/${fileName}`;
+                        console.log('Image URL:', imageUrl);
+
+                    } catch (uploadError) {
+                        console.error('Image upload failed:', uploadError);
+                        alert('Image upload failed: ' + uploadError.message);
+                        throw uploadError;
+                    }
+                }
+
+                // Create maid data object
+                const maidData = {
+                    full_name: document.getElementById('fullName').value,
+                    age: parseInt(document.getElementById('age').value),
+                    location: document.getElementById('location').value,
+                    type: document.getElementById('workType').value,
+                    working_hours: document.getElementById('workingHours').value,
+                    expected_salary: parseInt(document.getElementById('expectedSalary').value),
+                    experience: document.getElementById('experience').value,
+                    services: services,
+                    description: document.getElementById('description').value,
+                    contact_phone: document.getElementById('phone').value,
+                    contact_email: document.getElementById('email').value,
+                    profile_image: imageUrl,
+                    is_active: true,
+                    is_contact_unlocked: false
+                };
+
+                console.log('Submitting maid data:', maidData);
+
+                // Insert into Supabase
+                const { data, error } = await supabase
+                    .from('maids')
+                    .insert([maidData])
+                    .select()
+                    .single();
+
+                if (error) {
+                    console.error('Database error:', error);
+                    throw error;
+                }
+
+                console.log('Profile created successfully:', data);
+
+                // Show success message overlay
+                const overlay = document.createElement('div');
+                overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                overlay.innerHTML = `
+                    <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full mx-4">
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-check text-2xl text-green-500"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Profile Created Successfully!</h3>
+                            <p class="text-gray-600 mb-6">Your profile has been created and is now visible to potential employers.</p>
+                            <div class="flex flex-col gap-3">
+                                <button onclick="window.location.href='find-maids.html'" class="w-full bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary transition-colors">
+                                    View All Profiles
+                                </button>
+                                <button onclick="window.location.href='index.html'" class="w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors">
+                                    Go to Homepage
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+
+                // Reset form without confirmation
+                this.reset();
+                document.getElementById('profileImagePreview').src = 'https://placehold.co/400x400/eee/aaa?text=Profile';
+                updateCharCount();
+
+            } catch (error) {
+                console.error('Error creating profile:', error);
+                alert(error.message || 'Error creating profile. Please try again.');
+                
+                // Reset button state
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            }
+        });
+
+        // Form reset button handler (only show confirmation for manual reset)
+        document.getElementById('profileForm').addEventListener('reset', function(e) {
+            // Only show confirmation if the reset was triggered by the reset button
+            if (e.submitter && e.submitter.type === 'reset') {
+                if (!confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+            
+            // Reset image preview
+            const preview = document.getElementById('profileImagePreview');
+            preview.src = 'https://placehold.co/400x400/eee/aaa?text=Profile';
+            preview.classList.remove('border-brand-primary');
+            preview.classList.add('border-gray-200');
+            document.getElementById('profileImage').value = '';
+            
+            // Reset character count
+            updateCharCount();
+        });
     </script>
 </body>
-</html> 
+</html>

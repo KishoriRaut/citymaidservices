@@ -1,193 +1,139 @@
-// Local Storage Keys
-const STORAGE_KEYS = {
-    MAIDS: 'citymaid_maids',
-    JOBS: 'citymaid_jobs',
-    USERS: 'citymaid_users'
-};
+// Function to create a job card for the homepage
+function createHomeJobCard(job) {
+    const serviceIcons = Array.isArray(job.services) ? job.services.map(service => 
+        `<span class="mr-2" title="${service}">${window.SERVICE_ICONS[service] || service}</span>`
+    ).join('') : '';
 
-// Initialize local storage with empty arrays if not exists
-function initializeStorage() {
-    if (!localStorage.getItem(STORAGE_KEYS.MAIDS)) {
-        localStorage.setItem(STORAGE_KEYS.MAIDS, JSON.stringify([]));
-    }
-    if (!localStorage.getItem(STORAGE_KEYS.JOBS)) {
-        localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify([]));
-    }
-    if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
-        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]));
-    }
-}
-
-// Mobile Navigation Toggle
-document.addEventListener('DOMContentLoaded', function() {
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-    
-    if (hamburger) {
-        hamburger.addEventListener('click', function() {
-            navLinks.classList.toggle('active');
-            hamburger.classList.toggle('active');
-        });
-    }
-
-    // Initialize storage
-    initializeStorage();
-
-    // Load content based on current page
-    const currentPage = window.location.pathname.split('/').pop();
-    if (currentPage === 'index.html' || currentPage === '') {
-        loadLatestJobs();
-        loadLatestMaids();
-    }
-});
-
-// Load Latest Jobs
-function loadLatestJobs() {
-    const jobsGrid = document.getElementById('jobsGrid');
-    if (!jobsGrid) return;
-
-    const jobs = JSON.parse(localStorage.getItem(STORAGE_KEYS.JOBS) || '[]');
-    const latestJobs = jobs.slice(-6); // Show latest 6 jobs
-
-    jobsGrid.innerHTML = latestJobs.map(job => `
-        <div class="card">
-            <div class="card-content">
-                <div class="card-header">
-                    <h3>${job.ownerName}</h3>
-                    <span class="location"><i class="fas fa-map-marker-alt"></i> ${job.location}</span>
+    return `
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900">${job.owner_name || 'No Name'}</h3>
+                    <p class="text-gray-600">${job.location || 'No Location'}</p>
                 </div>
-                
-                <div class="job-details">
-                    <div class="detail-group">
-                        <h4>Job Requirements</h4>
-                        <p><i class="fas fa-clock"></i> ${job.workingHours}</p>
-                        <p><i class="fas fa-calendar"></i> ${job.frequency}</p>
-                        <p><i class="fas fa-money-bill"></i> NPR ${job.salary}</p>
-                    </div>
-                    
-                    <div class="services-list">
-                        <h4>Services Needed</h4>
-                        ${job.services.map(service => `
-                            <span class="service-tag"><i class="fas fa-check"></i> ${service}</span>
-                        `).join('')}
-                    </div>
-                    
-                    <div class="additional-info">
-                        <p>${job.additionalRequirements || 'No additional requirements'}</p>
-                    </div>
-                </div>
-                
-                <button class="btn primary contact-btn" onclick="unlockContact('job', '${job.id}')">
-                    <i class="fas fa-phone"></i> View Contact Details
-                </button>
+                <span class="bg-brand-light text-brand-primary text-sm font-medium px-3 py-1 rounded">
+                    ${job.type || 'No Type'}
+                </span>
+            </div>
+            <div class="mb-4">
+                <p class="text-gray-700"><strong>Salary:</strong> NPR ${job.salary || 'Not specified'}</p>
+                <p class="text-gray-700"><strong>Experience Required:</strong> ${job.required_experience || 'Not specified'}</p>
+            </div>
+            <div class="mb-4">
+                <p class="text-gray-700 mb-2"><strong>Services Required:</strong></p>
+                <div class="flex flex-wrap">${serviceIcons || 'No services specified'}</div>
+            </div>
+            <div class="mt-4 flex justify-between items-center">
+                <span class="text-gray-500 text-sm">Posted ${window.formatDate(job.created_at)}</span>
+                <a href="find-jobs.html" class="text-brand-primary hover:text-brand-secondary font-semibold">View Details →</a>
             </div>
         </div>
-    `).join('');
+    `;
 }
 
-// Load Latest Maids
-function loadLatestMaids() {
-    const maidsGrid = document.getElementById('maidsGrid');
-    if (!maidsGrid) return;
+// Function to create a maid card for the homepage
+function createHomeMaidCard(maid) {
+    const serviceIcons = Array.isArray(maid.services) ? maid.services.map(service => 
+        `<span class="mr-2" title="${service}">${window.SERVICE_ICONS[service] || service}</span>`
+    ).join('') : '';
 
-    const maids = JSON.parse(localStorage.getItem(STORAGE_KEYS.MAIDS) || '[]');
-    const latestMaids = maids.slice(-6); // Show latest 6 maids
-
-    maidsGrid.innerHTML = latestMaids.map(maid => `
-        <div class="card">
-            <div class="card-content">
-                <div class="profile-header">
-                    <img src="${maid.photo || 'images/default-avatar.jpg'}" alt="${maid.name}" class="maid-photo">
-                    <div class="basic-info">
-                        <h3>${maid.name}</h3>
-                        <span class="age">${maid.age} years old</span>
-                        <span class="location"><i class="fas fa-map-marker-alt"></i> ${maid.location}</span>
-                    </div>
+    return `
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900">${maid.full_name || 'No Name'}</h3>
+                    <p class="text-gray-600">${maid.location || 'No Location'}</p>
                 </div>
-                
-                <div class="maid-details">
-                    <div class="work-info">
-                        <h4>Work Preferences</h4>
-                        <p><i class="fas fa-briefcase"></i> ${maid.workType}</p>
-                        <p><i class="fas fa-money-bill"></i> NPR ${maid.expectedSalary}</p>
-                        <p><i class="fas fa-calendar"></i> Available from: ${new Date(maid.availableFrom).toLocaleDateString()}</p>
-                    </div>
-                    
-                    <div class="services-list">
-                        <h4>Services Offered</h4>
-                        ${maid.services.map(service => `
-                            <span class="service-tag"><i class="fas fa-check"></i> ${service}</span>
-                        `).join('')}
-                    </div>
-                    
-                    <div class="experience">
-                        <h4>Experience</h4>
-                        <p>${maid.experience || 'Experience details not provided'}</p>
-                    </div>
-                </div>
-                
-                <button class="btn primary contact-btn" onclick="unlockContact('maid', '${maid.id}')">
-                    <i class="fas fa-phone"></i> View Contact Details
-                </button>
+                <span class="bg-brand-light text-brand-primary text-sm font-medium px-3 py-1 rounded">
+                    ${maid.type || 'No Type'}
+                </span>
+            </div>
+            <div class="mb-4">
+                <p class="text-gray-700"><strong>Experience:</strong> ${maid.experience || 'Not specified'}</p>
+                <p class="text-gray-700"><strong>Expected Salary:</strong> NPR ${maid.expected_salary || 'Not specified'}</p>
+            </div>
+            <div class="mb-4">
+                <p class="text-gray-700 mb-2"><strong>Services Offered:</strong></p>
+                <div class="flex flex-wrap">${serviceIcons || 'No services specified'}</div>
+            </div>
+            <div class="mt-4 flex justify-between items-center">
+                <span class="text-gray-500 text-sm">Registered ${window.formatDate(maid.created_at)}</span>
+                <a href="find-maids.html" class="text-brand-primary hover:text-brand-secondary font-semibold">View Details →</a>
             </div>
         </div>
-    `).join('');
+    `;
 }
 
-// Unlock Contact Information
-function unlockContact(type, id) {
-    // Check if user is logged in
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (!currentUser) {
-        alert('Please sign in to view contact information');
-        window.location.href = 'signin.html';
-        return;
-    }
+// Function to show error message
+function showError(containerId, message, error = null) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = `
+        <div class="col-span-3 text-center py-12">
+            <div class="max-w-2xl mx-auto bg-red-50 border border-red-200 rounded-lg p-6">
+                <p class="text-red-600 text-lg mb-2">${message}</p>
+                ${error ? `<p class="text-sm text-red-500 mt-2">Try opening this page using a local server instead of directly from the file system.</p>` : ''}
+                <button onclick="window.location.reload()" class="mt-4 bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                    Try Again
+                </button>
+            </div>
+        </div>`;
+}
 
-    // Initialize Khalti payment
-    const config = {
-        "publicKey": "test_public_key_dc74e0fd57cb46cd93832aee0a390234",
-        "productIdentity": id,
-        "productName": type === 'maid' ? "Maid Contact Information" : "Job Contact Information",
-        "productUrl": "http://localhost:3000",
-        "paymentPreference": [
-            "KHALTI"
-        ],
-        "eventHandler": {
-            onSuccess(payload) {
-                // Handle successful payment
-                showContactInfo(type, id);
-            },
-            onError(error) {
-                console.log(error);
-                alert('Payment failed. Please try again.');
-            },
-            onClose() {
-                console.log('Payment window closed');
-            }
+// Function to load latest jobs
+async function loadLatestJobs() {
+    try {
+        console.log('Loading latest jobs...');
+        const jobs = await window.getLatestJobs(3);
+        console.log('Received latest jobs:', jobs);
+        
+        const jobsContainer = document.getElementById('latestJobs');
+        const noJobsMessage = document.getElementById('noJobs');
+        
+        if (!jobs || jobs.length === 0) {
+            jobsContainer.innerHTML = '';
+            noJobsMessage.classList.remove('hidden');
+            return;
         }
-    };
 
-    const checkout = new KhaltiCheckout(config);
-    checkout.show({ amount: 1000 }); // Amount in paisa (10 NPR)
-}
-
-// Show Contact Information
-function showContactInfo(type, id) {
-    const data = type === 'maid' 
-        ? JSON.parse(localStorage.getItem(STORAGE_KEYS.MAIDS)).find(m => m.id === id)
-        : JSON.parse(localStorage.getItem(STORAGE_KEYS.JOBS)).find(j => j.id === id);
-
-    if (data) {
-        alert(`
-            Contact Information:
-            Phone: ${data.phone}
-            Email: ${data.email}
-        `);
+        noJobsMessage.classList.add('hidden');
+        jobsContainer.innerHTML = jobs.map(job => createHomeJobCard(job)).join('');
+    } catch (error) {
+        console.error('Error loading latest jobs:', error);
+        showError('latestJobs', 'Unable to load jobs at the moment.', error);
     }
 }
 
-// Generate Unique ID
-function generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-} 
+// Function to load latest maids
+async function loadLatestMaids() {
+    try {
+        console.log('Loading latest maids...');
+        const maids = await window.getLatestMaids(3);
+        console.log('Received latest maids:', maids);
+        
+        const maidsContainer = document.getElementById('latestMaids');
+        const noMaidsMessage = document.getElementById('noMaids');
+        
+        if (!maids || maids.length === 0) {
+            maidsContainer.innerHTML = '';
+            noMaidsMessage.classList.remove('hidden');
+            return;
+        }
+
+        noMaidsMessage.classList.add('hidden');
+        maidsContainer.innerHTML = maids.map(maid => createHomeMaidCard(maid)).join('');
+    } catch (error) {
+        console.error('Error loading latest maids:', error);
+        showError('latestMaids', 'Unable to load maids at the moment.', error);
+    }
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Page loaded, initializing...');
+    // Check if running from file system
+    if (window.location.protocol === 'file:') {
+        console.warn('Running from file system - network requests may be blocked');
+    }
+    loadLatestJobs();
+    loadLatestMaids();
+}); 

@@ -3,248 +3,482 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Maids - City Maid</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Find Maids - CityMaid</title>
+    <!-- Add Khalti SDK first -->
+    <script src="https://khalti.s3.ap-south-1.amazonaws.com/KPG/dist/2020.12.22.0.0.0/khalti-checkout.iffe.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#4F46E5',
+                            secondary: '#4338CA',
+                            light: '#EEF2FF',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .filters {
-            background: white;
-            padding: 1rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-
-        .filter-group {
-            margin-bottom: 1rem;
-        }
-
-        .filter-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .filter-group select,
-        .filter-group input {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-        }
-
-        .maids-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .maid-card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            overflow: hidden;
-            transition: transform 0.3s;
-        }
-
-        .maid-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .maid-photo {
-            width: 100%;
-            height: 200px;
+        .profile-image {
+            aspect-ratio: 3/4;
             object-fit: cover;
+            object-position: center 15%;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                       0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+                       0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
         }
 
-        .maid-info {
-            padding: 1.5rem;
+        .badge {
+            background: linear-gradient(135deg, #4F46E5, #4338CA);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
         }
 
-        .maid-info h3 {
-            margin-bottom: 0.5rem;
-            color: var(--text-color);
-        }
-
-        .maid-info p {
-            margin-bottom: 0.5rem;
-            color: #666;
-        }
-
-        .services-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin: 1rem 0;
-        }
-
-        .service-tag {
-            background: var(--light-gray);
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.9rem;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 2rem;
-            color: #666;
+        .truncate-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
     </style>
 </head>
-<body>
+<body class="bg-brand-light font-poppins">
     <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="logo">
-            <h1>City Maid</h1>
-        </div>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="find-maids.html" class="active">Find Maids</a>
-            <a href="find-jobs.html">Find Jobs</a>
-            <a href="create-profile.html">Create Profile</a>
-            <a href="post-job.html">Post a Job</a>
-            <a href="contact.html">Contact Us</a>
-            <a href="about.html">About Us</a>
-            <a href="signin.html" class="auth-btn">Sign In</a>
-        </div>
-        <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-3xl font-bold text-brand-primary tracking-tight">City<span class="text-brand-secondary">Maid</span></a>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Home</a>
+                    <a href="find-maids.html" class="text-brand-primary font-semibold">Find Maids</a>
+                    <a href="find-jobs.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Find Jobs</a>
+                    <a href="create-profile.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Create Profile</a>
+                    <a href="post-job.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Post a Job</a>
+                    <a href="contact.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Contact Us</a>
+                    <a href="about.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">About Us</a>
+                    <div id="authButton">
+                        <a href="signin.html" class="bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary font-semibold transition-colors">Sign In</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main>
-        <div class="filters">
-            <div class="filter-group">
-                <label for="locationFilter">Location</label>
-                <select id="locationFilter" onchange="filterMaids()">
-                    <option value="">All Locations</option>
-                    <option value="Sanepa">Sanepa</option>
-                    <option value="Kalanki">Kalanki</option>
-                    <option value="Baneshwor">Baneshwor</option>
-                    <option value="Maitighar">Maitighar</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="workTypeFilter">Work Type</label>
-                <select id="workTypeFilter" onchange="filterMaids()">
-                    <option value="">All Types</option>
-                    <option value="part-time">Part Time</option>
+    <!-- Search and Filter Section -->
+    <section class="py-8 bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="text" id="searchLocation" placeholder="Search by location..." 
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
+                <select id="workType" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
+                    <option value="">All Work Types</option>
                     <option value="full-time">Full Time</option>
-                    <option value="home-stay">Home Stay</option>
+                    <option value="part-time">Part Time</option>
+                    <option value="live-in">Live In</option>
                 </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="serviceFilter">Service</label>
-                <select id="serviceFilter" onchange="filterMaids()">
-                    <option value="">All Services</option>
-                    <option value="cooking">Cooking</option>
-                    <option value="cleaning">Cleaning</option>
-                    <option value="laundry">Laundry</option>
-                    <option value="childcare">Childcare</option>
-                    <option value="elderly">Elderly Care</option>
+                <select id="experience" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
+                    <option value="">All Experience Levels</option>
+                    <option value="0-1 years">0-1 years</option>
+                    <option value="1-3 years">1-3 years</option>
+                    <option value="3-5 years">3-5 years</option>
+                    <option value="5+ years">5+ years</option>
                 </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="salaryFilter">Maximum Salary (NPR)</label>
-                <input type="number" id="salaryFilter" min="0" onchange="filterMaids()">
+                <button id="searchButton" class="bg-brand-primary text-white px-6 py-2 rounded-lg hover:bg-brand-secondary transition-colors">
+                    Search Maids
+                </button>
             </div>
         </div>
+    </section>
 
-        <div class="maids-grid" id="maidsGrid">
-            <!-- Maids will be dynamically loaded here -->
+    <!-- Maids List Section -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Available Domestic Helpers</h1>
+                <p class="text-lg text-gray-600">Browse through our verified domestic helpers</p>
+            </div>
+            
+            <div id="maidsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Loading State -->
+                <div class="col-span-full flex justify-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-primary"></div>
+                </div>
+            </div>
         </div>
-    </main>
+    </section>
+
+    <!-- Contact Details Modal -->
+    <div id="contactModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full mx-4">
+            <div class="text-center">
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Contact Information</h3>
+                <div id="contactDetails" class="mb-6">
+                    <!-- Contact details will be inserted here -->
+                </div>
+                <button onclick="closeContactModal()" class="w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>City Maid</h3>
-                <p>Connecting trusted domestic help with employers in Nepal</p>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="find-maids.html">Find Maids</a></li>
-                    <li><a href="find-jobs.html">Find Jobs</a></li>
-                    <li><a href="create-profile.html">Create Profile</a></li>
-                    <li><a href="post-job.html">Post a Job</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <p>Email: info@citymaid.com</p>
-                <p>Phone: +977-1-4XXXXXX</p>
+    <footer class="bg-gray-900 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">CityMaid</h3>
+                    <p class="text-gray-400 leading-relaxed">Connecting trusted domestic help with employers in Nepal</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-6">Quick Links</h3>
+                    <ul class="space-y-4">
+                        <li><a href="find-maids.html" class="text-gray-400 hover:text-white transition-colors">Find Maids</a></li>
+                        <li><a href="find-jobs.html" class="text-gray-400 hover:text-white transition-colors">Find Jobs</a></li>
+                        <li><a href="create-profile.html" class="text-gray-400 hover:text-white transition-colors">Create Profile</a></li>
+                        <li><a href="post-job.html" class="text-gray-400 hover:text-white transition-colors">Post a Job</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-6">Contact Info</h3>
+                    <p class="text-gray-400 mb-4">Email: info@citymaid.com</p>
+                    <p class="text-gray-400">Phone: +977-1-4XXXXXX</p>
+                </div>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 City Maid. All rights reserved.</p>
+        <div class="border-t border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <p class="text-center text-gray-400">&copy; 2024 CityMaid. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
     <script>
-        // Load and display maids
-        function loadMaids(filters = {}) {
-            const maidsGrid = document.getElementById('maidsGrid');
-            const maids = JSON.parse(localStorage.getItem(STORAGE_KEYS.MAIDS) || '[]');
+        // Initialize Supabase
+        const supabaseUrl = 'https://fdgqqxyyofjnkhswkwcq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZ3FxeHl5b2Zqbmtoc3drd2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMjQyMTMsImV4cCI6MjA1OTYwMDIxM30.YyJLLu3r2a7Mh7ny0ie-YzzLfPh5PdrJJHnBFBxWqVE';
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-            // Apply filters
-            let filteredMaids = maids.filter(maid => {
-                if (filters.location && maid.location !== filters.location) return false;
-                if (filters.workType && maid.workType !== filters.workType) return false;
-                if (filters.service && !maid.services.includes(filters.service)) return false;
-                if (filters.maxSalary && parseInt(maid.expectedSalary) > filters.maxSalary) return false;
-                return true;
-            });
+        let currentMaidId = null;
 
-            if (filteredMaids.length === 0) {
-                maidsGrid.innerHTML = '<div class="no-results">No maids found matching your criteria</div>';
-                return;
-            }
+        // Format salary
+        function formatSalary(salary) {
+            if (!salary) return 'Not specified';
+            return new Intl.NumberFormat('en-NP', {
+                style: 'currency',
+                currency: 'NPR',
+                maximumFractionDigits: 0
+            }).format(salary);
+        }
 
-            maidsGrid.innerHTML = filteredMaids.map(maid => `
-                <div class="maid-card">
-                    <img src="${maid.photo || 'images/default-avatar.jpg'}" alt="${maid.name}" class="maid-photo">
-                    <div class="maid-info">
-                        <h3>${maid.name}</h3>
-                        <p><strong>Age:</strong> ${maid.age}</p>
-                        <p><strong>Location:</strong> ${maid.location}</p>
-                        <p><strong>Work Type:</strong> ${maid.workType}</p>
-                        <p><strong>Expected Salary:</strong> NPR ${maid.expectedSalary}</p>
-                        <div class="services-list">
-                            ${maid.services.map(service => `
-                                <span class="service-tag">${service}</span>
-                            `).join('')}
+        // Handle contact button click
+        async function handleContactClick(maidId) {
+            try {
+                currentMaidId = maidId;
+                const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+                
+                if (!session) {
+                    const returnUrl = encodeURIComponent(window.location.href);
+                    window.location.href = `signin.html?returnUrl=${returnUrl}`;
+                    return;
+                }
+
+                // Check if already unlocked
+                const { data: unlocks, error: checksError } = await supabaseClient
+                    .from('contact_unlocks')
+                    .select('*')
+                    .eq('maid_id', maidId)
+                    .eq('user_id', session.user.id)
+                    .single();
+
+                if (unlocks) {
+                    // Already paid, show contact details directly
+                    await showContactDetails(maidId, true);
+                } else {
+                    // Show payment modal first
+                    const contactModal = document.getElementById('contactModal');
+                    const contactDetails = document.getElementById('contactDetails');
+                    
+                    contactDetails.innerHTML = `
+                        <div class="text-center">
+                            <i class="fas fa-lock text-4xl text-brand-primary mb-4"></i>
+                            <p class="text-gray-600 mb-4">Contact information is locked.</p>
+                            <p class="text-gray-600 mb-4">Please make a payment to unlock contact details.</p>
+                            <button onclick="initializeKhaltiPayment('${maidId}')" 
+                                    class="w-full bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary transition-colors mb-3">
+                                Pay to Unlock Contact (NPR 100)
+                            </button>
                         </div>
-                        <button class="btn primary" onclick="unlockContact('maid', '${maid.id}')">View Contact</button>
+                    `;
+                    
+                    contactModal.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error('Error handling contact click:', error);
+                alert('Failed to process request. Please try again.');
+            }
+        }
+
+        // Initialize Khalti payment
+        function initializeKhaltiPayment(maidId) {
+            let config = {
+                publicKey: "test_public_key_dc74e0fd57cb46cd93832aee0a390234",
+                productIdentity: maidId,
+                productName: "Maid Contact Information",
+                productUrl: window.location.href,
+                amount: 10000, // Amount in paisa (NPR 100)
+                eventHandler: {
+                    onSuccess: async function (payload) {
+                        console.log('Payment success:', payload);
+                        try {
+                            // Get current user
+                            const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+                            if (sessionError) throw sessionError;
+
+                            // Save payment record
+                            const { error: paymentError } = await supabaseClient
+                                .from('payments')
+                                .insert([{
+                                    user_id: session.user.id,
+                                    amount: 100,
+                                    payment_id: payload.idx,
+                                    payment_type: 'maid_contact',
+                                    status: 'completed',
+                                    maid_id: maidId
+                                }]);
+                            if (paymentError) throw paymentError;
+
+                            // Save contact unlock record
+                            const { error: unlockError } = await supabaseClient
+                                .from('contact_unlocks')
+                                .insert([{
+                                    user_id: session.user.id,
+                                    maid_id: maidId,
+                                    unlocked_at: new Date().toISOString()
+                                }]);
+                            if (unlockError) throw unlockError;
+
+                            // Show contact details
+                            await showContactDetails(maidId, true);
+
+                        } catch (error) {
+                            console.error('Error processing payment success:', error);
+                            alert('Payment recorded but error occurred. Please contact support.');
+                        }
+                    },
+                    onError: function (error) {
+                        console.log('Payment error:', error);
+                        alert('Payment failed. Please try again.');
+                    },
+                    onClose: function () {
+                        console.log('Payment widget closed');
+                    }
+                }
+            };
+
+            let checkout = new KhaltiCheckout(config);
+            checkout.show({ amount: 10000 });
+        }
+
+        // Show contact details
+        async function showContactDetails(maidId, paid = false) {
+            try {
+                const { data: maid, error } = await supabaseClient
+                    .from('maids')
+                    .select('contact_phone, contact_email, full_name')
+                    .eq('id', maidId)
+                    .single();
+
+                if (error) throw error;
+
+                const contactModal = document.getElementById('contactModal');
+                const contactDetails = document.getElementById('contactDetails');
+
+                if (paid) {
+                    contactDetails.innerHTML = `
+                        <div class="text-left space-y-4">
+                            <div class="mb-4 text-center">
+                                <i class="fas fa-check-circle text-4xl text-green-500 mb-2"></i>
+                                <p class="text-gray-600">Contact information unlocked!</p>
+                            </div>
+                            <p class="flex items-center">
+                                <i class="fas fa-user w-6 text-brand-primary"></i>
+                                <span class="ml-2">${maid.full_name || 'Not provided'}</span>
+                            </p>
+                            <p class="flex items-center">
+                                <i class="fas fa-phone w-6 text-brand-primary"></i>
+                                <span class="ml-2">${maid.contact_phone || 'Not provided'}</span>
+                            </p>
+                            <p class="flex items-center">
+                                <i class="fas fa-envelope w-6 text-brand-primary"></i>
+                                <span class="ml-2">${maid.contact_email || 'Not provided'}</span>
+                            </p>
+                        </div>
+                    `;
+                }
+
+                contactModal.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error showing contact details:', error);
+                alert('Failed to load contact details. Please try again.');
+            }
+        }
+
+        // Close contact modal
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.add('hidden');
+        }
+
+        // Create maid card HTML
+        function createMaidCard(maid) {
+            return `
+                <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                    <div class="relative">
+                        <img src="${maid.profile_image || 'https://placehold.co/300x400/eee/aaa?text=No+Image'}" 
+                             alt="${maid.full_name}" 
+                             class="w-full profile-image">
+                        <div class="absolute top-4 right-4">
+                            <span class="badge">
+                                ${maid.type}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">${maid.full_name}</h3>
+                        <div class="space-y-2 mb-4">
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-map-marker-alt text-brand-primary mr-2 w-5"></i>
+                                ${maid.location}
+                            </p>
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-clock text-brand-primary mr-2 w-5"></i>
+                                ${maid.working_hours || 'Not specified'}
+                            </p>
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-star text-brand-primary mr-2 w-5"></i>
+                                ${maid.experience}
+                            </p>
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-money-bill-wave text-brand-primary mr-2 w-5"></i>
+                                ${formatSalary(maid.expected_salary)}/month
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            ${maid.services.slice(0, 3).map(service => `
+                                <span class="px-3 py-1 bg-brand-light text-brand-primary rounded-full text-sm">
+                                    ${service}
+                                </span>
+                            `).join('')}
+                            ${maid.services.length > 3 ? `
+                                <span class="px-3 py-1 bg-brand-light text-brand-primary rounded-full text-sm">
+                                    +${maid.services.length - 3} more
+                                </span>
+                            ` : ''}
+                        </div>
+                        <p class="text-gray-600 mb-4 truncate-2">${maid.description || 'No description available'}</p>
+                        <button onclick="handleContactClick('${maid.id}')" 
+                                class="w-full bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary transition-colors">
+                            Contact Maid
+                        </button>
                     </div>
                 </div>
-            `).join('');
+            `;
         }
 
-        // Filter maids based on selected criteria
-        function filterMaids() {
-            const filters = {
-                location: document.getElementById('locationFilter').value,
-                workType: document.getElementById('workTypeFilter').value,
-                service: document.getElementById('serviceFilter').value,
-                maxSalary: document.getElementById('salaryFilter').value
-            };
-            loadMaids(filters);
+        // Fetch and display maids
+        async function fetchMaids() {
+            const maidsContainer = document.getElementById('maidsContainer');
+            maidsContainer.innerHTML = `
+                <div class="col-span-full flex justify-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-primary"></div>
+                </div>
+            `;
+
+            try {
+                const location = document.getElementById('searchLocation').value;
+                const workType = document.getElementById('workType').value;
+                const experience = document.getElementById('experience').value;
+
+                let query = supabaseClient
+                    .from('maids')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: false });
+
+                if (location) {
+                    query = query.ilike('location', `%${location}%`);
+                }
+                if (workType) {
+                    query = query.eq('type', workType);
+                }
+                if (experience) {
+                    query = query.eq('experience', experience);
+                }
+
+                const { data: maids, error } = await query;
+
+                if (error) throw error;
+
+                if (!maids || maids.length === 0) {
+                    maidsContainer.innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <i class="fas fa-search text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-500">No maids found matching your criteria</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                maidsContainer.innerHTML = maids.map(maid => createMaidCard(maid)).join('');
+
+            } catch (error) {
+                console.error('Error loading maids:', error);
+                maidsContainer.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <i class="fas fa-exclamation-circle text-4xl text-red-500 mb-4"></i>
+                        <p class="text-gray-500">Error loading profiles. Please try again later.</p>
+                    </div>
+                `;
+            }
         }
 
-        // Load maids when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            loadMaids();
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchMaids();
+            
+            // Add event listeners for real-time filtering
+            document.getElementById('searchLocation').addEventListener('input', fetchMaids);
+            document.getElementById('workType').addEventListener('change', fetchMaids);
+            document.getElementById('experience').addEventListener('change', fetchMaids);
+            document.getElementById('searchButton').addEventListener('click', fetchMaids);
         });
     </script>
 </body>
-</html> 
+</html>

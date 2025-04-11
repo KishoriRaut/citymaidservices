@@ -1,263 +1,186 @@
-<!DOCTYPE html>
+<!DOCTYPE html>  
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - City Maid</title>
-    <link rel="stylesheet" href="css/style.css">
+      <title>Contact Us - City Maid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .contact-container {
-            max-width: 1200px;
-            margin: 100px auto;
-            padding: 2rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#4F46E5', 
+                            secondary: '#4338CA',
+                            light: '#EEF2FF',
+                        }
+                    }
+               }
         }
-
-        .contact-info {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .contact-info h2 {
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .info-item i {
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            margin-right: 1rem;
-            width: 40px;
-            text-align: center;
-        }
-
-        .info-item div h3 {
-            color: var(--text-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .info-item div p {
-            color: #666;
-        }
-
-        .social-links {
-            margin-top: 2rem;
-        }
-
-        .social-links h3 {
-            color: var(--text-color);
-            margin-bottom: 1rem;
-        }
-
-        .social-icons {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .social-icons a {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--light-gray);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary-color);
-            transition: all 0.3s;
-        }
-
-        .social-icons a:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-3px);
-        }
-
-        .contact-form {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .contact-form h2 {
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            color: var(--text-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-
-        .form-group textarea {
-            height: 150px;
-            resize: vertical;
-        }
-
-        .submit-btn {
-            background: var(--primary-color);
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s;
-        }
-
-        .submit-btn:hover {
-            background: var(--secondary-color);
-        }
-
-        @media (max-width: 768px) {
-            .contact-container {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-        }
-    </style>
+    </script>
 </head>
-<body>
+<body class="bg-brand-light font-poppins">
     <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="logo">
-            <h1>City Maid</h1>
-        </div>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="find-maids.html">Find Maids</a>
-            <a href="find-jobs.html">Find Jobs</a>
-            <a href="create-profile.html">Create Profile</a>
-            <a href="post-job.html">Post a Job</a>
-            <a href="contact.html" class="active">Contact Us</a>
-            <a href="about.html">About Us</a>
-            <a href="signin.html" class="auth-btn">Sign In</a>
-        </div>
-        <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-3xl font-bold text-brand-primary tracking-tight">City<span class="text-brand-secondary">Maid</span></a>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Home</a>
+                    <a href="find-maids.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Find Maids</a>
+                    <a href="find-jobs.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Find Jobs</a>
+                    <a href="create-profile.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Create Profile</a>
+                    <a href="post-job.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Post a Job</a>
+                    <a href="contact.html" class="text-brand-primary font-semibold">Contact Us</a>
+                    <a href="about.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">About Us</a>
+                    <a href="signin.html" class="bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary font-semibold transition-colors">Sign In</a>
+                </div>
+            </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main>
-        <div class="contact-container">
-            <div class="contact-info">
-                <h2>Get in Touch</h2>
-                <div class="info-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <div>
-                        <h3>Address</h3>
-                        <p>123 Main Street, Kathmandu, Nepal</p>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-phone"></i>
-                    <div>
-                        <h3>Phone</h3>
-                        <p>+977-1-4XXXXXX</p>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-envelope"></i>
-                    <div>
-                        <h3>Email</h3>
-                        <p>info@citymaid.com</p>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-clock"></i>
-                    <div>
-                        <h3>Working Hours</h3>
-                        <p>Monday - Saturday: 9:00 AM - 6:00 PM</p>
-                    </div>
-                </div>
-                <div class="social-links">
-                    <h3>Follow Us</h3>
-                    <div class="social-icons">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-            </div>
+    <main class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <!-- Contact Information -->
+                <div class="bg-white rounded-2xl shadow-xl p-10">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-8">Get in Touch</h2>
+                    
+                    <div class="space-y-8">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-brand-light p-4 rounded-lg">
+                                <i class="fas fa-map-marker-alt text-2xl text-brand-primary"></i>
+                            </div>
+                            <div class="ml-6">
+                                <h3 class="text-xl font-semibold text-gray-900">Address</h3>
+                                <p class="text-gray-600 mt-2">123 Main Street, Kathmandu, Nepal</p>
+                            </div>
+                        </div>
 
-            <div class="contact-form">
-                <h2>Send us a Message</h2>
-                <form id="contactForm" onsubmit="handleContactSubmit(event)">
-                    <div class="form-group">
-                        <label for="name">Full Name</label>
-                        <input type="text" id="name" name="name" required>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-brand-light p-4 rounded-lg">
+                                <i class="fas fa-phone text-2xl text-brand-primary"></i>
+                            </div>
+                            <div class="ml-6">
+                                <h3 class="text-xl font-semibold text-gray-900">Phone</h3>
+                                <p class="text-gray-600 mt-2">+977-1-4XXXXXX</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-brand-light p-4 rounded-lg">
+                                <i class="fas fa-envelope text-2xl text-brand-primary"></i>
+                            </div>
+                            <div class="ml-6">
+                                <h3 class="text-xl font-semibold text-gray-900">Email</h3>
+                                <p class="text-gray-600 mt-2">info@citymaid.com</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-brand-light p-4 rounded-lg">
+                                <i class="fas fa-clock text-2xl text-brand-primary"></i>
+                            </div>
+                            <div class="ml-6">
+                                <h3 class="text-xl font-semibold text-gray-900">Working Hours</h3>
+                                <p class="text-gray-600 mt-2">Monday - Saturday: 9:00 AM - 6:00 PM</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
+
+                    <div class="mt-12">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-6">Follow Us</h3>
+                        <div class="flex space-x-5">
+                            <a href="#" class="w-12 h-12 flex items-center justify-center rounded-lg bg-brand-light text-brand-primary hover:bg-brand-primary hover:text-white transition-all transform hover:-translate-y-1">
+                                <i class="fab fa-facebook-f text-xl"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 flex items-center justify-center rounded-lg bg-brand-light text-brand-primary hover:bg-brand-primary hover:text-white transition-all transform hover:-translate-y-1">
+                                <i class="fab fa-twitter text-xl"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 flex items-center justify-center rounded-lg bg-brand-light text-brand-primary hover:bg-brand-primary hover:text-white transition-all transform hover:-translate-y-1">
+                                <i class="fab fa-instagram text-xl"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 flex items-center justify-center rounded-lg bg-brand-light text-brand-primary hover:bg-brand-primary hover:text-white transition-all transform hover:-translate-y-1">
+                                <i class="fab fa-linkedin-in text-xl"></i>
+                            </a>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="subject">Subject</label>
-                        <input type="text" id="subject" name="subject" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="message">Message</label>
-                        <textarea id="message" name="message" required></textarea>
-                    </div>
-                    <button type="submit" class="submit-btn">Send Message</button>
-                </form>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="bg-white rounded-2xl shadow-xl p-10">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-8">Send us a Message</h2>
+                    <form id="contactForm" onsubmit="handleContactSubmit(event)" class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                            <input type="text" id="name" name="name" required
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-colors">
+                        </div>
+
+                        <div>
+                            <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                            <input type="email" id="email" name="email" required
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-colors">
+                        </div>
+
+                        <div>
+                            <label for="subject" class="block text-sm font-semibold text-gray-700 mb-2">Subject</label>
+                            <input type="text" id="subject" name="subject" required
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-colors">
+                        </div>
+
+                        <div>
+                            <label for="message" class="block text-sm font-semibold text-gray-700 mb-2">Your Message</label>
+                            <textarea id="message" name="message" rows="5" required
+                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-colors"></textarea>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full bg-brand-primary text-white py-4 px-6 rounded-lg text-lg font-semibold hover:bg-brand-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary transition-colors transform hover:-translate-y-0.5">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>City Maid</h3>
-                <p>Connecting trusted domestic help with employers in Nepal</p>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="find-maids.html">Find Maids</a></li>
-                    <li><a href="find-jobs.html">Find Jobs</a></li>
-                    <li><a href="create-profile.html">Create Profile</a></li>
-                    <li><a href="post-job.html">Post a Job</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <p>Email: info@citymaid.com</p>
-                <p>Phone: +977-1-4XXXXXX</p>
+    <footer class="bg-gray-900 text-white mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">CityMaid</h3>
+                    <p class="text-gray-400 leading-relaxed">Connecting trusted domestic help with employers in Nepal</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-6">Quick Links</h3>
+                    <ul class="space-y-4">
+                        <li><a href="find-maids.html" class="text-gray-400 hover:text-white transition-colors">Find Maids</a></li>
+                        <li><a href="find-jobs.html" class="text-gray-400 hover:text-white transition-colors">Find Jobs</a></li>
+                        <li><a href="create-profile.html" class="text-gray-400 hover:text-white transition-colors">Create Profile</a></li>
+                        <li><a href="post-job.html" class="text-gray-400 hover:text-white transition-colors">Post a Job</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-6">Contact Info</h3>
+                    <p class="text-gray-400 mb-4">Email: info@citymaid.com</p>
+                    <p class="text-gray-400">Phone: +977-1-4XXXXXX</p>
+                </div>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 City Maid. All rights reserved.</p>
+        <div class="border-t border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <p class="text-center text-gray-400">&copy; 2024 CityMaid. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 

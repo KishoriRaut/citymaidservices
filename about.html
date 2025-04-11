@@ -4,190 +4,154 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - City Maid</title>
-    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .about-container {
-            max-width: 800px;
-            margin: 100px auto;
-            padding: 2rem;
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#4F46E5',
+                            secondary: '#4338CA',
+                            light: '#EEF2FF',
+                        }
+                    }
+                }
+            }
         }
-
-        .about-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-
-        .about-section h2 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-
-        .about-section p {
-            line-height: 1.8;
-            color: var(--text-color);
-            margin-bottom: 1rem;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .feature-card {
-            text-align: center;
-            padding: 1.5rem;
-            background: var(--light-gray);
-            border-radius: 10px;
-            transition: transform 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .feature-card i {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-
-        .feature-card h3 {
-            margin-bottom: 0.5rem;
-            color: var(--text-color);
-        }
-
-        .feature-card p {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .team-section {
-            text-align: center;
-        }
-
-        .team-members {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .team-member {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .team-member img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            margin-bottom: 1rem;
-            object-fit: cover;
-        }
-
-        .team-member h3 {
-            color: var(--text-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .team-member p {
-            color: #666;
-            font-size: 0.9rem;
-        }
-    </style>
+    </script>
 </head>
-<body>
+<body class="bg-brand-light font-poppins">
     <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="logo">
-            <h1>City Maid</h1>
-        </div>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="find-maids.html">Find Maids</a>
-            <a href="find-jobs.html">Find Jobs</a>
-            <a href="create-profile.html">Create Profile</a>
-            <a href="post-job.html">Post a Job</a>
-            <a href="contact.html">Contact Us</a>
-            <a href="about.html" class="active">About Us</a>
-            <a href="signin.html" class="auth-btn">Sign In</a>
-        </div>
-        <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-3xl font-bold text-brand-primary tracking-tight">City<span class="text-brand-secondary">Maid</span></a>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Home</a>
+                    <a href="find-maids.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Find Maids</a>
+                    <a href="find-jobs.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Find Jobs</a>
+                    <a href="create-profile.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Create Profile</a>
+                    <a href="post-job.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Post a Job</a>
+                    <a href="contact.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Contact Us</a>
+                    <a href="about.html" class="text-brand-primary font-semibold">About Us</a>
+                    <a href="signin.html" class="bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary font-semibold transition-colors">Sign In</a>
+                </div>
+            </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main>
-        <div class="about-container">
-            <div class="about-section">
-                <h2>About City Maid</h2>
-                <p>City Maid is a platform dedicated to connecting trusted domestic help with employers in Nepal. We understand the importance of finding reliable household assistance and aim to make this process as smooth and secure as possible.</p>
-                <p>Our mission is to create a safe and efficient marketplace where both domestic workers and employers can find their perfect match. We believe in providing equal opportunities and fair treatment for all parties involved.</p>
+    <main class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- About Section -->
+            <div class="bg-white rounded-2xl shadow-xl p-12 mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-8">About CityMaid</h2>
+                <div class="prose max-w-none">
+                    <p class="text-lg text-gray-600 leading-relaxed mb-6">CityMaid is a platform dedicated to connecting trusted domestic help with employers in Nepal. We understand the importance of finding reliable household assistance and aim to make this process as smooth and secure as possible.</p>
+                    <p class="text-lg text-gray-600 leading-relaxed">Our mission is to create a safe and efficient marketplace where both domestic workers and employers can find their perfect match. We believe in providing equal opportunities and fair treatment for all parties involved.</p>
+                </div>
             </div>
 
-            <div class="about-section">
-                <h2>Our Features</h2>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <i class="fas fa-user-shield"></i>
-                        <h3>Verified Profiles</h3>
-                        <p>All profiles are manually verified to ensure authenticity and reliability.</p>
+            <!-- Features Section -->
+            <div class="bg-white rounded-2xl shadow-xl p-12 mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-12 text-center">Our Features</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="p-8 bg-brand-light rounded-xl text-center hover:shadow-lg transition-all transform hover:-translate-y-1">
+                        <div class="text-brand-primary text-4xl mb-6">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Verified Profiles</h3>
+                        <p class="text-gray-600 leading-relaxed">All profiles are manually verified to ensure authenticity and reliability.</p>
                     </div>
-                    <div class="feature-card">
-                        <i class="fas fa-handshake"></i>
-                        <h3>Secure Payments</h3>
-                        <p>Safe and secure payment processing through Khalti integration.</p>
+
+                    <div class="p-8 bg-brand-light rounded-xl text-center hover:shadow-lg transition-all transform hover:-translate-y-1">
+                        <div class="text-brand-primary text-4xl mb-6">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Secure Payments</h3>
+                        <p class="text-gray-600 leading-relaxed">Safe and secure payment processing through Khalti integration.</p>
                     </div>
-                    <div class="feature-card">
-                        <i class="fas fa-search"></i>
-                        <h3>Easy Search</h3>
-                        <p>Advanced search and filter options to find the perfect match.</p>
+
+                    <div class="p-8 bg-brand-light rounded-xl text-center hover:shadow-lg transition-all transform hover:-translate-y-1">
+                        <div class="text-brand-primary text-4xl mb-6">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Easy Search</h3>
+                        <p class="text-gray-600 leading-relaxed">Advanced search and filter options to find the perfect match.</p>
                     </div>
-                    <div class="feature-card">
-                        <i class="fas fa-comments"></i>
-                        <h3>Direct Contact</h3>
-                        <p>Connect directly with potential matches after verification.</p>
+
+                    <div class="p-8 bg-brand-light rounded-xl text-center hover:shadow-lg transition-all transform hover:-translate-y-1">
+                        <div class="text-brand-primary text-4xl mb-6">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Direct Contact</h3>
+                        <p class="text-gray-600 leading-relaxed">Connect directly with potential matches after verification.</p>
                     </div>
                 </div>
             </div>
 
-            <div class="about-section">
-                <h2>How It Works</h2>
-                <p>1. Create a profile or post a job listing - it's completely free!</p>
-                <p>2. Browse through available maids or jobs that match your requirements.</p>
-                <p>3. Use our advanced filters to narrow down your search.</p>
-                <p>4. When you find a potential match, unlock their contact information through our secure payment system.</p>
-                <p>5. Connect directly and arrange the details of your working relationship.</p>
+            <!-- How It Works Section -->
+            <div class="bg-white rounded-2xl shadow-xl p-12 mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-12 text-center">How It Works</h2>
+                <div class="space-y-8">
+                    <div class="flex items-start group">
+                        <div class="flex-shrink-0 w-12 h-12 bg-brand-primary text-white rounded-xl flex items-center justify-center font-bold text-xl group-hover:bg-brand-secondary transition-colors">1</div>
+                        <p class="ml-6 text-lg text-gray-600 leading-relaxed pt-2">Create a profile or post a job listing - it's completely free!</p>
+                    </div>
+                    <div class="flex items-start group">
+                        <div class="flex-shrink-0 w-12 h-12 bg-brand-primary text-white rounded-xl flex items-center justify-center font-bold text-xl group-hover:bg-brand-secondary transition-colors">2</div>
+                        <p class="ml-6 text-lg text-gray-600 leading-relaxed pt-2">Browse through available maids or jobs that match your requirements.</p>
+                    </div>
+                    <div class="flex items-start group">
+                        <div class="flex-shrink-0 w-12 h-12 bg-brand-primary text-white rounded-xl flex items-center justify-center font-bold text-xl group-hover:bg-brand-secondary transition-colors">3</div>
+                        <p class="ml-6 text-lg text-gray-600 leading-relaxed pt-2">Use our advanced filters to narrow down your search.</p>
+                    </div>
+                    <div class="flex items-start group">
+                        <div class="flex-shrink-0 w-12 h-12 bg-brand-primary text-white rounded-xl flex items-center justify-center font-bold text-xl group-hover:bg-brand-secondary transition-colors">4</div>
+                        <p class="ml-6 text-lg text-gray-600 leading-relaxed pt-2">When you find a potential match, unlock their contact information through our secure payment system.</p>
+                    </div>
+                    <div class="flex items-start group">
+                        <div class="flex-shrink-0 w-12 h-12 bg-brand-primary text-white rounded-xl flex items-center justify-center font-bold text-xl group-hover:bg-brand-secondary transition-colors">5</div>
+                        <p class="ml-6 text-lg text-gray-600 leading-relaxed pt-2">Connect directly and arrange the details of your working relationship.</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="about-section team-section">
-                <h2>Our Team</h2>
-                <div class="team-members">
-                    <div class="team-member">
-                        <img src="images/team1.jpg" alt="Team Member">
-                        <h3>John Doe</h3>
-                        <p>Founder & CEO</p>
+            <!-- Team Section -->
+            <div class="bg-white rounded-2xl shadow-xl p-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-12 text-center">Our Team</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div class="text-center group">
+                        <div class="relative w-48 h-48 mx-auto mb-6 transform group-hover:scale-105 transition-transform">
+                            <img src="images/team1.jpg" alt="Team Member" class="w-full h-full rounded-2xl object-cover shadow-lg">
+                            <div class="absolute inset-0 bg-brand-primary bg-opacity-10 rounded-2xl"></div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">John Doe</h3>
+                        <p class="text-lg text-brand-primary font-medium">Founder & CEO</p>
                     </div>
-                    <div class="team-member">
-                        <img src="images/team2.jpg" alt="Team Member">
-                        <h3>Jane Smith</h3>
-                        <p>Operations Manager</p>
+                    <div class="text-center group">
+                        <div class="relative w-48 h-48 mx-auto mb-6 transform group-hover:scale-105 transition-transform">
+                            <img src="images/team2.jpg" alt="Team Member" class="w-full h-full rounded-2xl object-cover shadow-lg">
+                            <div class="absolute inset-0 bg-brand-primary bg-opacity-10 rounded-2xl"></div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Jane Smith</h3>
+                        <p class="text-lg text-brand-primary font-medium">Operations Manager</p>
                     </div>
-                    <div class="team-member">
-                        <img src="images/team3.jpg" alt="Team Member">
-                        <h3>Mike Johnson</h3>
-                        <p>Customer Support</p>
+                    <div class="text-center group">
+                        <div class="relative w-48 h-48 mx-auto mb-6 transform group-hover:scale-105 transition-transform">
+                            <img src="images/team3.jpg" alt="Team Member" class="w-full h-full rounded-2xl object-cover shadow-lg">
+                            <div class="absolute inset-0 bg-brand-primary bg-opacity-10 rounded-2xl"></div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Mike Johnson</h3>
+                        <p class="text-lg text-brand-primary font-medium">Customer Support</p>
                     </div>
                 </div>
             </div>
@@ -195,29 +159,33 @@
     </main>
 
     <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>City Maid</h3>
-                <p>Connecting trusted domestic help with employers in Nepal</p>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="find-maids.html">Find Maids</a></li>
-                    <li><a href="find-jobs.html">Find Jobs</a></li>
-                    <li><a href="create-profile.html">Create Profile</a></li>
-                    <li><a href="post-job.html">Post a Job</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <p>Email: info@citymaid.com</p>
-                <p>Phone: +977-1-4XXXXXX</p>
+    <footer class="bg-gray-900 text-white mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">CityMaid</h3>
+                    <p class="text-gray-400 leading-relaxed">Connecting trusted domestic help with employers in Nepal</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-6">Quick Links</h3>
+                    <ul class="space-y-4">
+                        <li><a href="find-maids.html" class="text-gray-400 hover:text-white transition-colors">Find Maids</a></li>
+                        <li><a href="find-jobs.html" class="text-gray-400 hover:text-white transition-colors">Find Jobs</a></li>
+                        <li><a href="create-profile.html" class="text-gray-400 hover:text-white transition-colors">Create Profile</a></li>
+                        <li><a href="post-job.html" class="text-gray-400 hover:text-white transition-colors">Post a Job</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-6">Contact Info</h3>
+                    <p class="text-gray-400 mb-4">Email: info@citymaid.com</p>
+                    <p class="text-gray-400">Phone: +977-1-4XXXXXX</p>
+                </div>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 City Maid. All rights reserved.</p>
+        <div class="border-t border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <p class="text-center text-gray-400">&copy; 2024 CityMaid. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 
