@@ -196,9 +196,9 @@
     <!-- Footer -->
     <footer class="bg-gray-900 text-white mt-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
                 <div>
-                    <h3 class="text-2xl font-bold mb-6">CityMaid</h3>
+                    <h3 class="text-2xl font-bold mb-6">City Maid Services</h3>
                     <p class="text-gray-400 leading-relaxed">Connecting trusted domestic help with employers in Nepal</p>
                 </div>
                 <div>
@@ -206,25 +206,38 @@
                     <ul class="space-y-4">
                         <li><a href="find-maids.html" class="text-gray-400 hover:text-white transition-colors">Find Maids</a></li>
                         <li><a href="find-jobs.html" class="text-gray-400 hover:text-white transition-colors">Find Jobs</a></li>
-                        <li><a href="create-profile.html" class="text-gray-400 hover:text-white transition-colors">Create Profile</a></li>
+                        <li><a href="../profile/create-profile.html" class="text-gray-400 hover:text-white transition-colors">Create Profile</a></li>
                         <li><a href="post-job.html" class="text-gray-400 hover:text-white transition-colors">Post a Job</a></li>
                     </ul>
                 </div>
                 <div>
+                    <h3 class="text-xl font-bold mb-6">Legal</h3>
+                    <ul class="space-y-4">
+                        <li><a href="../static/privacy-policy.html" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="../static/terms-of-service.html" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="../static/refund-policy.html" class="text-gray-400 hover:text-white transition-colors">Refund Policy</a></li>
+                        <li><a href="../static/cookie-policy.html" class="text-gray-400 hover:text-white transition-colors">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div>
                     <h3 class="text-xl font-bold mb-6">Contact Info</h3>
-                    <p class="text-gray-400 mb-4">Email: info@citymaid.com</p>
-                    <p class="text-gray-400">Phone: +977-1-4XXXXXX</p>
+                    <p class="text-gray-400 mb-2">Address: Talchhikhel 15, Satdobato, Lalitpur, Nepal</p>
+                    <p class="text-gray-400 mb-4">Email: info@citymaidservices.net</p>
+                    <p class="text-gray-400">Phone: +977-9841317273</p>
                 </div>
             </div>
         </div>
         <div class="border-t border-gray-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <p class="text-center text-gray-400">&copy; 2024 CityMaid. All rights reserved.</p>
+                <p class="text-center text-gray-400">&copy; <span id="currentYear"></span> City Maid Services. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script>
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
         // Initialize Supabase
         const supabaseUrl = 'https://fdgqqxyyofjnkhswkwcq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZ3FxeHl5b2Zqbmtoc3drd2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMjQyMTMsImV4cCI6MjA1OTYwMDIxM30.YyJLLu3r2a7Mh7ny0ie-YzzLfPh5PdrJJHnBFBxWqVE';

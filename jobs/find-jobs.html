@@ -84,16 +84,24 @@
     <!-- Search and Filter Section -->
     <section class="py-8 bg-white shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <input type="text" id="searchLocation" placeholder="Search by location..." 
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
-                <select id="filterJobType" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
+                <select id="serviceType" title="Service Type" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
+                    <option value="">All Services</option>
+                    <option value="cooking">Cooking</option>
+                    <option value="cleaning">Cleaning</option>
+                    <option value="laundry">Laundry</option>
+                    <option value="childcare">Childcare</option>
+                    <option value="elderly">Elderly Care</option>
+                </select>
+                <select id="filterJobType" title="Job Type" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
                     <option value="">All Job Types</option>
                     <option value="full-time">Full Time</option>
                     <option value="part-time">Part Time</option>
                     <option value="live-in">Live In</option>
                 </select>
-                <select id="filterExperience" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
+                <select id="filterExperience" title="Experience Level" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
                     <option value="">All Experience Levels</option>
                     <option value="0-1">0-1 years</option>
                     <option value="1-3">1-3 years</option>
@@ -117,18 +125,6 @@
             
             <div id="jobsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Jobs will be dynamically inserted here -->
-            </div>
-
-            <!-- Loading State -->
-            <div id="loadingState" class="text-center py-12">
-                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-primary mx-auto"></div>
-                <p class="mt-4 text-gray-600">Loading jobs...</p>
-            </div>
-
-            <!-- No Results State -->
-            <div id="noResultsState" class="text-center py-12 hidden">
-                <i class="fas fa-search text-4xl text-gray-400 mb-4"></i>
-                <p class="text-xl text-gray-600">No jobs found matching your criteria</p>
             </div>
         </div>
     </section>
@@ -156,11 +152,11 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white mt-16">
+    <footer class="bg-gray-900 text-white mt-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
                 <div>
-                    <h3 class="text-2xl font-bold mb-6">CityMaid</h3>
+                    <h3 class="text-2xl font-bold mb-6">City Maid Services</h3>
                     <p class="text-gray-400 leading-relaxed">Connecting trusted domestic help with employers in Nepal</p>
                 </div>
                 <div>
@@ -169,25 +165,37 @@
                         <li><a href="find-maids.html" class="text-gray-400 hover:text-white transition-colors">Find Maids</a></li>
                         <li><a href="find-jobs.html" class="text-gray-400 hover:text-white transition-colors">Find Jobs</a></li>
                         <li><a href="../profile/create-profile.html" class="text-gray-400 hover:text-white transition-colors">Create Profile</a></li>
-                        <li><a href="create-profile.html" class="text-gray-400 hover:text-white transition-colors">Create Profile</a></li>
                         <li><a href="post-job.html" class="text-gray-400 hover:text-white transition-colors">Post a Job</a></li>
                     </ul>
                 </div>
                 <div>
+                    <h3 class="text-xl font-bold mb-6">Legal</h3>
+                    <ul class="space-y-4">
+                        <li><a href="../static/privacy-policy.html" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="../static/terms-of-service.html" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="../static/refund-policy.html" class="text-gray-400 hover:text-white transition-colors">Refund Policy</a></li>
+                        <li><a href="../static/cookie-policy.html" class="text-gray-400 hover:text-white transition-colors">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div>
                     <h3 class="text-xl font-bold mb-6">Contact Info</h3>
-                    <p class="text-gray-400 mb-4">Email: info@citymaid.com</p>
-                    <p class="text-gray-400">Phone: +977-1-4XXXXXX</p>
+                    <p class="text-gray-400 mb-2">Address: Talchhikhel 15, Satdobato, Lalitpur, Nepal</p>
+                    <p class="text-gray-400 mb-4">Email: info@citymaidservices.net</p>
+                    <p class="text-gray-400">Phone: +977-9841317273</p>
                 </div>
             </div>
         </div>
         <div class="border-t border-gray-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <p class="text-center text-gray-400">&copy; 2024 CityMaid. All rights reserved.</p>
+                <p class="text-center text-gray-400">&copy; <span id="currentYear"></span> City Maid Services. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script>
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
         // Initialize Supabase
         const supabaseUrl = 'https://fdgqqxyyofjnkhswkwcq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZ3FxeHl5b2Zqbmtoc3drd2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMjQyMTMsImV4cCI6MjA1OTYwMDIxM30.YyJLLu3r2a7Mh7ny0ie-YzzLfPh5PdrJJHnBFBxWqVE';
@@ -195,6 +203,27 @@
 
         let currentJobId = null;
         let khaltiCheckout = null;
+
+        // Show loading state
+        function showLoading(container) {
+            container.innerHTML = `
+                <div class="col-span-full flex justify-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-primary"></div>
+                </div>
+            `;
+        }
+
+        // Show error state
+        function showError(container, message) {
+            container.innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                        <i class="fas fa-exclamation-circle text-2xl text-red-500"></i>
+                    </div>
+                    <p class="text-gray-500">${message}</p>
+                </div>
+            `;
+        }
 
         // Initialize Khalti
         function initializeKhalti() {
@@ -405,18 +434,22 @@
 
         // Fetch and display jobs
         async function fetchJobs() {
-            const loadingState = document.getElementById('loadingState');
-            const noResultsState = document.getElementById('noResultsState');
             const jobsContainer = document.getElementById('jobsContainer');
-
-            loadingState.classList.remove('hidden');
-            noResultsState.classList.add('hidden');
-            jobsContainer.innerHTML = '';
+            showLoading(jobsContainer);
 
             try {
+                console.log('Fetching jobs...');
                 const location = document.getElementById('searchLocation').value;
+                const serviceType = document.getElementById('serviceType').value;
                 const jobType = document.getElementById('filterJobType').value;
                 const experience = document.getElementById('filterExperience').value;
+
+                console.log('Filters:', { location, serviceType, jobType, experience });
+
+                // Set a timeout for the Supabase query
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Request timed out')), 10000)
+                );
 
                 let query = supabaseClient
                     .from('jobs')
@@ -427,33 +460,63 @@
                 if (location) {
                     query = query.ilike('location', `%${location}%`);
                 }
+                
+                if (serviceType) {
+                    query = query.contains('services', [serviceType]);
+                }
+                
                 if (jobType) {
                     query = query.eq('type', jobType);
                 }
+                
                 if (experience) {
                     query = query.eq('required_experience', experience);
                 }
 
-                const { data: jobs, error } = await query;
+                console.log('Executing Supabase query...');
+                
+                // Race between the query and the timeout
+                const { data: jobs, error } = await Promise.race([
+                    query,
+                    timeoutPromise.then(() => ({ data: null, error: new Error('Request timed out') }))
+                ]);
+                
+                console.log('Query result:', { jobs, error });
 
-                if (error) throw error;
-
-                loadingState.classList.add('hidden');
+                if (error) {
+                    console.error('Supabase error:', error);
+                    throw error;
+                }
 
                 if (!jobs || jobs.length === 0) {
-                    noResultsState.classList.remove('hidden');
+                    console.log('No jobs found');
+                    jobsContainer.innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+                                <i class="fas fa-search text-2xl text-gray-400"></i>
+                            </div>
+                            <p class="text-gray-500">No jobs found matching your criteria</p>
+                        </div>
+                    `;
                     return;
                 }
 
+                console.log(`Found ${jobs.length} jobs`);
                 jobsContainer.innerHTML = jobs.map(job => createJobCard(job)).join('');
 
             } catch (error) {
                 console.error('Error fetching jobs:', error);
-                loadingState.classList.add('hidden');
+                
+                // Show error message with retry button
                 jobsContainer.innerHTML = `
                     <div class="col-span-full text-center py-12">
-                        <i class="fas fa-exclamation-circle text-4xl text-red-500 mb-4"></i>
-                        <p class="text-gray-500">Error loading jobs. Please try again later.</p>
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                            <i class="fas fa-exclamation-circle text-2xl text-red-500"></i>
+                        </div>
+                        <p class="text-gray-500 mb-4">Error loading jobs. Please try again.</p>
+                        <button onclick="fetchJobs()" class="bg-brand-primary text-white px-6 py-2 rounded-lg hover:bg-brand-secondary transition-colors">
+                            Retry
+                        </button>
                     </div>
                 `;
             }
@@ -461,11 +524,21 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
+            // Check if Supabase is properly initialized
+            if (!window.supabase || !supabaseClient) {
+                console.error('Supabase client not initialized properly');
+                const container = document.getElementById('jobsContainer');
+                showError(container, 'Error connecting to the database. Please refresh the page.');
+                return;
+            }
+            
+            console.log('Supabase client initialized successfully');
             initializeKhalti();
             fetchJobs();
             
             // Add event listeners for real-time filtering
             document.getElementById('searchLocation').addEventListener('input', fetchJobs);
+            document.getElementById('serviceType').addEventListener('change', fetchJobs);
             document.getElementById('filterJobType').addEventListener('change', fetchJobs);
             document.getElementById('filterExperience').addEventListener('change', fetchJobs);
             document.getElementById('searchButton').addEventListener('click', fetchJobs);

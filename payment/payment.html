@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - City Maid Services</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/supabase@2"></script>
+    <script>
+        const supabaseUrl = 'https://your-supabase-url.supabase.co';
+        const supabaseKey = 'your-supabase-key';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="/" class="text-2xl font-bold text-blue-600">City Maid Services</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <a href="/dashboard/employer-dashboard.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <button id="logoutBtn" class="ml-4 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-6">Unlock Contact Information</h1>
+            
+            <!-- Contact Details Preview -->
+            <div class="border-b border-gray-200 pb-6 mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Contact Details Preview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-50 p-4 rounded-md">
+                        <p class="text-gray-600">Name: <span id="contactName" class="text-gray-900 font-medium">Loading...</span></p>
+                        <p class="text-gray-600">Location: <span id="contactLocation" class="text-gray-900 font-medium">Loading...</span></p>
+                        <p class="text-gray-600">Experience: <span id="contactExperience" class="text-gray-900 font-medium">Loading...</span></p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-md">
+                        <p class="text-gray-600">Phone: <span class="text-gray-400">*****</span></p>
+                        <p class="text-gray-600">Email: <span class="text-gray-400">*****</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Options -->
+            <div class="mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Select Payment Option</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="border border-gray-200 rounded-md p-4 cursor-pointer hover:border-blue-500" onclick="selectPaymentOption('single')">
+                        <h3 class="font-medium text-gray-900">Single Contact</h3>
+                        <p class="text-2xl font-bold text-blue-600">$9.99</p>
+                        <p class="text-sm text-gray-500">Unlock one contact</p>
+                    </div>
+                    <div class="border border-gray-200 rounded-md p-4 cursor-pointer hover:border-blue-500" onclick="selectPaymentOption('monthly')">
+                        <h3 class="font-medium text-gray-900">Monthly Plan</h3>
+                        <p class="text-2xl font-bold text-blue-600">$29.99</p>
+                        <p class="text-sm text-gray-500">Unlock up to 5 contacts</p>
+                    </div>
+                    <div class="border border-gray-200 rounded-md p-4 cursor-pointer hover:border-blue-500" onclick="selectPaymentOption('yearly')">
+                        <h3 class="font-medium text-gray-900">Yearly Plan</h3>
+                        <p class="text-2xl font-bold text-blue-600">$99.99</p>
+                        <p class="text-sm text-gray-500">Unlock unlimited contacts</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Form -->
+            <div id="paymentForm" class="hidden">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Payment Details</h2>
+                <form id="checkoutForm" class="space-y-4">
+                    <div>
+                        <label for="cardName" class="block text-sm font-medium text-gray-700">Name on Card</label>
+                        <input type="text" id="cardName" name="cardName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="cardNumber" class="block text-sm font-medium text-gray-700">Card Number</label>
+                        <input type="text" id="cardNumber" name="cardNumber" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="expiryDate" class="block text-sm font-medium text-gray-700">Expiry Date</label>
+                            <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/YY" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="cvv" class="block text-sm font-medium text-gray-700">CVV</label>
+                            <input type="text" id="cvv" name="cvv" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+                        Pay Now
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <p class="text-center text-gray-400">&copy; <span id="currentYear"></span> City Maid Services. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Get contact ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const contactId = urlParams.get('id');
+
+        // Load contact details
+        async function loadContactDetails() {
+            try {
+                const { data, error } = await supabase
+                    .from('maids')
+                    .select('*')
+                    .eq('id', contactId)
+                    .single();
+
+                if (error) throw error;
+
+                document.getElementById('contactName').textContent = data.name;
+                document.getElementById('contactLocation').textContent = data.location;
+                document.getElementById('contactExperience').textContent = data.experience + ' years';
+            } catch (error) {
+                console.error('Error loading contact details:', error);
+            }
+        }
+
+        // Select payment option
+        function selectPaymentOption(option) {
+            document.getElementById('paymentForm').classList.remove('hidden');
+            // Store selected option
+            window.selectedPaymentOption = option;
+        }
+
+        // Handle form submission
+        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Here you would integrate with your payment processor (e.g., Stripe)
+            // For now, we'll simulate a successful payment
+            
+            try {
+                // Record the payment in your database
+                const { data, error } = await supabase
+                    .from('payments')
+                    .insert([
+                        {
+                            user_id: 'current-user-id', // Replace with actual user ID
+                            contact_id: contactId,
+                            amount: getPaymentAmount(window.selectedPaymentOption),
+                            status: 'completed',
+                            payment_type: window.selectedPaymentOption
+                        }
+                    ]);
+
+                if (error) throw error;
+
+                // Redirect to success page
+                window.location.href = '/payment/success.html?payment_id=' + data[0].id;
+            } catch (error) {
+                console.error('Error processing payment:', error);
+                alert('There was an error processing your payment. Please try again.');
+            }
+        });
+
+        // Get payment amount based on selected option
+        function getPaymentAmount(option) {
+            switch (option) {
+                case 'single': return 9.99;
+                case 'monthly': return 29.99;
+                case 'yearly': return 99.99;
+                default: return 9.99;
+            }
+        }
+
+        // Load contact details when page loads
+        document.addEventListener('DOMContentLoaded', loadContactDetails);
+
+        // Handle logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                window.location.href = '/auth/signin.html';
+            } catch (error) {
+                console.error('Error signing out:', error);
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -90,16 +90,24 @@
     <!-- Search and Filter Section -->
     <section class="py-8 bg-white shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <input type="text" id="searchLocation" placeholder="Search by location..." 
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
-                <select id="workType" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
+                <select id="serviceType" title="Service Type" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
+                    <option value="">All Services</option>
+                    <option value="cooking">Cooking</option>
+                    <option value="cleaning">Cleaning</option>
+                    <option value="laundry">Laundry</option>
+                    <option value="childcare">Childcare</option>
+                    <option value="elderly">Elderly Care</option>
+                </select>
+                <select id="workType" title="Work Type" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
                     <option value="">All Work Types</option>
                     <option value="full-time">Full Time</option>
                     <option value="part-time">Part Time</option>
                     <option value="live-in">Live In</option>
                 </select>
-                <select id="experience" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
+                <select id="experience" title="Experience Level" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary">
                     <option value="">All Experience Levels</option>
                     <option value="0-1 years">0-1 years</option>
                     <option value="1-3 years">1-3 years</option>
@@ -146,11 +154,11 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white mt-16">
+    <footer class="bg-gray-900 text-white mt-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
                 <div>
-                    <h3 class="text-2xl font-bold mb-6">CityMaid</h3>
+                    <h3 class="text-2xl font-bold mb-6">City Maid Services</h3>
                     <p class="text-gray-400 leading-relaxed">Connecting trusted domestic help with employers in Nepal</p>
                 </div>
                 <div>
@@ -158,31 +166,65 @@
                     <ul class="space-y-4">
                         <li><a href="find-maids.html" class="text-gray-400 hover:text-white transition-colors">Find Maids</a></li>
                         <li><a href="find-jobs.html" class="text-gray-400 hover:text-white transition-colors">Find Jobs</a></li>
-                        <li><a href="create-profile.html" class="text-gray-400 hover:text-white transition-colors">Create Profile</a></li>
+                        <li><a href="../profile/create-profile.html" class="text-gray-400 hover:text-white transition-colors">Create Profile</a></li>
                         <li><a href="post-job.html" class="text-gray-400 hover:text-white transition-colors">Post a Job</a></li>
                     </ul>
                 </div>
                 <div>
+                    <h3 class="text-xl font-bold mb-6">Legal</h3>
+                    <ul class="space-y-4">
+                        <li><a href="../static/privacy-policy.html" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="../static/terms-of-service.html" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="../static/refund-policy.html" class="text-gray-400 hover:text-white transition-colors">Refund Policy</a></li>
+                        <li><a href="../static/cookie-policy.html" class="text-gray-400 hover:text-white transition-colors">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div>
                     <h3 class="text-xl font-bold mb-6">Contact Info</h3>
-                    <p class="text-gray-400 mb-4">Email: info@citymaid.com</p>
-                    <p class="text-gray-400">Phone: +977-1-4XXXXXX</p>
+                    <p class="text-gray-400 mb-2">Address: Talchhikhel 15, Satdobato, Lalitpur, Nepal</p>
+                    <p class="text-gray-400 mb-4">Email: info@citymaidservices.net</p>
+                    <p class="text-gray-400">Phone: +977-9841317273</p>
                 </div>
             </div>
         </div>
         <div class="border-t border-gray-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <p class="text-center text-gray-400">&copy; 2024 CityMaid. All rights reserved.</p>
+                <p class="text-center text-gray-400">&copy; <span id="currentYear"></span> City Maid Services. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script>
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
         // Initialize Supabase
         const supabaseUrl = 'https://fdgqqxyyofjnkhswkwcq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZ3FxeHl5b2Zqbmtoc3drd2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMjQyMTMsImV4cCI6MjA1OTYwMDIxM30.YyJLLu3r2a7Mh7ny0ie-YzzLfPh5PdrJJHnBFBxWqVE';
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         let currentMaidId = null;
+
+        // Show loading state
+        function showLoading(container) {
+            container.innerHTML = `
+                <div class="col-span-full flex justify-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-primary"></div>
+                </div>
+            `;
+        }
+
+        // Show error state
+        function showError(container, message) {
+            container.innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                        <i class="fas fa-exclamation-circle text-2xl text-red-500"></i>
+                    </div>
+                    <p class="text-gray-500">${message}</p>
+                </div>
+            `;
+        }
 
         // Format salary
         function formatSalary(salary) {
@@ -400,7 +442,6 @@
                                 </span>
                             ` : ''}
                         </div>
-                        <p class="text-gray-600 mb-4 truncate-2">${maid.description || 'No description available'}</p>
                         <button onclick="handleContactClick('${maid.id}')" 
                                 class="w-full bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary transition-colors">
                             Contact Maid
@@ -412,56 +453,90 @@
 
         // Fetch and display maids
         async function fetchMaids() {
-            const maidsContainer = document.getElementById('maidsContainer');
-            maidsContainer.innerHTML = `
-                <div class="col-span-full flex justify-center">
-                    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-primary"></div>
-                </div>
-            `;
+            const container = document.getElementById('maidsContainer');
+            showLoading(container);
 
             try {
+                console.log('Fetching maids...');
                 const location = document.getElementById('searchLocation').value;
+                const serviceType = document.getElementById('serviceType').value;
                 const workType = document.getElementById('workType').value;
                 const experience = document.getElementById('experience').value;
+
+                console.log('Filters:', { location, serviceType, workType, experience });
+
+                // Set a timeout for the Supabase query
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Request timed out')), 10000)
+                );
 
                 let query = supabaseClient
                     .from('maids')
                     .select('*')
                     .eq('is_active', true)
-                    .order('created_at', { ascending: false });
+                    .order('type', { ascending: true }); // This will put 'home' profiles first
 
                 if (location) {
                     query = query.ilike('location', `%${location}%`);
                 }
+
+                if (serviceType) {
+                    query = query.contains('services', [serviceType]);
+                }
+
                 if (workType) {
                     query = query.eq('type', workType);
                 }
+
                 if (experience) {
                     query = query.eq('experience', experience);
                 }
 
-                const { data: maids, error } = await query;
+                console.log('Executing Supabase query...');
+                
+                // Race between the query and the timeout
+                const { data: maids, error } = await Promise.race([
+                    query,
+                    timeoutPromise.then(() => ({ data: null, error: new Error('Request timed out') }))
+                ]);
+                
+                console.log('Query result:', { maids, error });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase error:', error);
+                    throw error;
+                }
 
                 if (!maids || maids.length === 0) {
-                    maidsContainer.innerHTML = `
+                    console.log('No maids found');
+                    container.innerHTML = `
                         <div class="col-span-full text-center py-12">
-                            <i class="fas fa-search text-4xl text-gray-400 mb-4"></i>
-                            <p class="text-gray-500">No maids found matching your criteria</p>
+                            <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+                                <i class="fas fa-user-slash text-2xl text-gray-400"></i>
+                            </div>
+                            <p class="text-gray-500">No profiles found matching your criteria</p>
                         </div>
                     `;
                     return;
                 }
 
-                maidsContainer.innerHTML = maids.map(maid => createMaidCard(maid)).join('');
+                console.log(`Found ${maids.length} maids`);
+                const maidsHTML = maids.map(maid => createMaidCard(maid)).join('');
+                container.innerHTML = maidsHTML;
 
             } catch (error) {
-                console.error('Error loading maids:', error);
-                maidsContainer.innerHTML = `
+                console.error('Error fetching maids:', error);
+                
+                // Show error message with retry button
+                container.innerHTML = `
                     <div class="col-span-full text-center py-12">
-                        <i class="fas fa-exclamation-circle text-4xl text-red-500 mb-4"></i>
-                        <p class="text-gray-500">Error loading profiles. Please try again later.</p>
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                            <i class="fas fa-exclamation-circle text-2xl text-red-500"></i>
+                        </div>
+                        <p class="text-gray-500 mb-4">Error loading profiles. Please try again.</p>
+                        <button onclick="fetchMaids()" class="bg-brand-primary text-white px-6 py-2 rounded-lg hover:bg-brand-secondary transition-colors">
+                            Retry
+                        </button>
                     </div>
                 `;
             }
@@ -469,10 +544,20 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
+            // Check if Supabase is properly initialized
+            if (!window.supabase || !supabaseClient) {
+                console.error('Supabase client not initialized properly');
+                const container = document.getElementById('maidsContainer');
+                showError(container, 'Error connecting to the database. Please refresh the page.');
+                return;
+            }
+            
+            console.log('Supabase client initialized successfully');
             fetchMaids();
             
             // Add event listeners for real-time filtering
             document.getElementById('searchLocation').addEventListener('input', fetchMaids);
+            document.getElementById('serviceType').addEventListener('change', fetchMaids);
             document.getElementById('workType').addEventListener('change', fetchMaids);
             document.getElementById('experience').addEventListener('change', fetchMaids);
             document.getElementById('searchButton').addEventListener('click', fetchMaids);

@@ -246,6 +246,12 @@
         </div>
     </div>
 
+    <footer class="border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <p class="text-center text-gray-400">&copy; <span id="currentYear"></span> City Maid Services. All rights reserved.</p>
+        </div>
+    </footer>
+
     <script type="module">
         import { supabase } from './js/supabaseClient.js';
         import { utils } from './js/utils.js';
@@ -621,6 +627,9 @@
         // Make functions available globally
         window.toggleProfileStatus = toggleProfileStatus;
         window.exportUnlocks = exportUnlocks;
+
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
     </script>
 </body>
 </html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - City Maid Services</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/supabase@2"></script>
+    <script>
+        const supabaseUrl = 'https://your-supabase-url.supabase.co';
+        const supabaseKey = 'your-supabase-key';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="/" class="text-2xl font-bold text-blue-600">City Maid Services</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <a href="/dashboard/employer-dashboard.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <button id="logoutBtn" class="ml-4 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                    <i class="fas fa-check text-green-600 text-xl"></i>
+                </div>
+                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                    Payment Successful!
+                </h2>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Your payment has been processed successfully. You can now view the contact details.
+                </p>
+            </div>
+
+            <!-- Contact Details -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Contact Information</h3>
+                <div class="space-y-3">
+                    <p class="text-gray-600">Name: <span id="contactName" class="text-gray-900 font-medium">Loading...</span></p>
+                    <p class="text-gray-600">Phone: <span id="contactPhone" class="text-gray-900 font-medium">Loading...</span></p>
+                    <p class="text-gray-600">Email: <span id="contactEmail" class="text-gray-900 font-medium">Loading...</span></p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col space-y-3">
+                <a href="/payment/payment-history.html" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    View Payment History
+                </a>
+                <a href="/jobs/find-maids.html" class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Find More Maids
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <p class="text-center text-gray-400">&copy; <span id="currentYear"></span> City Maid Services. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Get payment ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentId = urlParams.get('payment_id');
+
+        // Load contact details
+        async function loadContactDetails() {
+            try {
+                const { data: payment, error: paymentError } = await supabase
+                    .from('payments')
+                    .select(`
+                        *,
+                        maids (
+                            id,
+                            name,
+                            phone,
+                            email
+                        )
+                    `)
+                    .eq('id', paymentId)
+                    .single();
+
+                if (paymentError) throw paymentError;
+
+                document.getElementById('contactName').textContent = payment.maids.name;
+                document.getElementById('contactPhone').textContent = payment.maids.phone;
+                document.getElementById('contactEmail').textContent = payment.maids.email;
+
+            } catch (error) {
+                console.error('Error loading contact details:', error);
+            }
+        }
+
+        // Handle logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                window.location.href = '/auth/signin.html';
+            } catch (error) {
+                console.error('Error signing out:', error);
+            }
+        });
+
+        // Load contact details when page loads
+        document.addEventListener('DOMContentLoaded', loadContactDetails);
+    </script>
+</body>
+</html> 

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment History - City Maid Services</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/supabase@2"></script>
+    <script>
+        const supabaseUrl = 'https://your-supabase-url.supabase.co';
+        const supabaseKey = 'your-supabase-key';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="/" class="text-2xl font-bold text-blue-600">City Maid Services</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <a href="/dashboard/employer-dashboard.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <button id="logoutBtn" class="ml-4 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-6">Payment History</h1>
+            
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-blue-800">Total Spent</h3>
+                    <p class="text-2xl font-bold text-blue-600" id="totalSpent">$0.00</p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-green-800">Contacts Unlocked</h3>
+                    <p class="text-2xl font-bold text-green-600" id="contactsUnlocked">0</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-purple-800">Active Plan</h3>
+                    <p class="text-2xl font-bold text-purple-600" id="activePlan">None</p>
+                </div>
+            </div>
+
+            <!-- Payment History Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="paymentHistoryTable">
+                        <!-- Payment history rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- No Payments Message -->
+            <div id="noPaymentsMessage" class="hidden text-center py-8">
+                <p class="text-gray-500">No payment history available.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <p class="text-center text-gray-400">&copy; <span id="currentYear"></span> City Maid Services. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Load payment history
+        async function loadPaymentHistory() {
+            try {
+                const { data: payments, error: paymentsError } = await supabase
+                    .from('payments')
+                    .select(`
+                        *,
+                        maids (
+                            id,
+                            name,
+                            phone,
+                            email
+                        )
+                    `)
+                    .order('created_at', { ascending: false });
+
+                if (paymentsError) throw paymentsError;
+
+                const tableBody = document.getElementById('paymentHistoryTable');
+                const noPaymentsMessage = document.getElementById('noPaymentsMessage');
+                
+                if (payments.length === 0) {
+                    tableBody.innerHTML = '';
+                    noPaymentsMessage.classList.remove('hidden');
+                    return;
+                }
+
+                noPaymentsMessage.classList.add('hidden');
+                let totalSpent = 0;
+
+                tableBody.innerHTML = payments.map(payment => {
+                    totalSpent += payment.amount;
+                    return `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                ${new Date(payment.created_at).toLocaleDateString()}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                ${payment.maids.name}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                $${payment.amount.toFixed(2)}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    ${payment.status}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <button onclick="viewContactDetails('${payment.maids.id}')" class="text-blue-600 hover:text-blue-900">
+                                    View Contact
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                // Update summary cards
+                document.getElementById('totalSpent').textContent = `$${totalSpent.toFixed(2)}`;
+                document.getElementById('contactsUnlocked').textContent = payments.length;
+                
+                // Check for active subscription
+                const activeSubscription = payments.find(p => p.payment_type === 'monthly' || p.payment_type === 'yearly');
+                document.getElementById('activePlan').textContent = activeSubscription ? 
+                    activeSubscription.payment_type.charAt(0).toUpperCase() + activeSubscription.payment_type.slice(1) : 
+                    'None';
+
+            } catch (error) {
+                console.error('Error loading payment history:', error);
+            }
+        }
+
+        // View contact details
+        function viewContactDetails(contactId) {
+            // Redirect to contact details page
+            window.location.href = `/jobs/maid-profile.html?id=${contactId}`;
+        }
+
+        // Handle logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                window.location.href = '/auth/signin.html';
+            } catch (error) {
+                console.error('Error signing out:', error);
+            }
+        });
+
+        // Load payment history when page loads
+        document.addEventListener('DOMContentLoaded', loadPaymentHistory);
+    </script>
+</body>
+</html> 

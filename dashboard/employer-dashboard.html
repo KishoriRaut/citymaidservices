@@ -507,6 +507,15 @@
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', loadDashboardData);
+
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
     </script>
+
+    <footer class="border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <p class="text-center text-gray-400">&copy; <span id="currentYear"></span> City Maid Services. All rights reserved.</p>
+        </div>
+    </footer>
 </body>
 </html>

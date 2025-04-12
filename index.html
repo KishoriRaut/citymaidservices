@@ -152,17 +152,29 @@
                 <p class="mt-6 text-lg text-gray-600">
                     Discover experienced and verified domestic helpers ready to assist you
                 </p>
+                <div class="mt-4 flex flex-wrap justify-center gap-4">
+                    <div class="bg-brand-light px-4 py-2 rounded-lg">
+                        <span class="text-brand-primary font-semibold" id="cookCount">-</span> Cooks
+                    </div>
+                    <div class="bg-brand-light px-4 py-2 rounded-lg">
+                        <span class="text-brand-primary font-semibold" id="cleanerCount">-</span> Cleaners
+                    </div>
+                    <div class="bg-brand-light px-4 py-2 rounded-lg">
+                        <span class="text-brand-primary font-semibold" id="childcareCount">-</span> Childcare
+                    </div>
+                    <div class="bg-brand-light px-4 py-2 rounded-lg">
+                        <span class="text-brand-primary font-semibold" id="elderlyCount">-</span> Elderly Care
+                    </div>
+                    <div class="bg-brand-light px-4 py-2 rounded-lg">
+                        <span class="text-brand-primary font-semibold" id="otherCount">-</span> Other Services
+                    </div>
+                </div>
             </div>
             <div id="latestMaidsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Loading placeholder -->
                 <div class="col-span-full flex justify-center">
                     <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-primary"></div>
                 </div>
-            </div>
-            <div id="loadMoreMaids" class="text-center mt-12 hidden">
-                <button onclick="loadMoreMaids()" class="bg-white text-brand-primary px-8 py-3 rounded-lg hover:bg-brand-light transition-colors font-semibold border-2 border-brand-primary">
-                    <i class="fas fa-sync-alt mr-2"></i>Load More Profiles
-                </button>
             </div>
             <div class="text-center mt-8">
                 <a href="jobs/find-maids.html" class="inline-block bg-brand-primary text-white px-8 py-3 rounded-lg hover:bg-brand-secondary transition-colors">
@@ -182,17 +194,29 @@
                 <p class="mt-6 text-lg text-gray-600">
                     Find your perfect domestic helper position with top employers
                 </p>
+                <div class="mt-4 flex flex-wrap justify-center gap-4">
+                    <div class="bg-brand-light px-4 py-2 rounded-lg">
+                        <span class="text-brand-primary font-semibold" id="cookJobsCount">-</span> Cook Jobs
+                    </div>
+                    <div class="bg-brand-light px-4 py-2 rounded-lg">
+                        <span class="text-brand-primary font-semibold" id="cleanerJobsCount">-</span> Cleaner Jobs
+                    </div>
+                    <div class="bg-brand-light px-4 py-2 rounded-lg">
+                        <span class="text-brand-primary font-semibold" id="childcareJobsCount">-</span> Childcare Jobs
+                    </div>
+                    <div class="bg-brand-light px-4 py-2 rounded-lg">
+                        <span class="text-brand-primary font-semibold" id="elderlyJobsCount">-</span> Elderly Care Jobs
+                    </div>
+                    <div class="bg-brand-light px-4 py-2 rounded-lg">
+                        <span class="text-brand-primary font-semibold" id="otherJobsCount">-</span> Other Jobs
+                    </div>
+                </div>
             </div>
             <div id="latestJobsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Loading placeholder -->
                 <div class="col-span-full flex justify-center">
                     <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-primary"></div>
                 </div>
-            </div>
-            <div id="loadMoreJobs" class="text-center mt-12 hidden">
-                <button onclick="loadMoreJobs()" class="bg-white text-brand-primary px-8 py-3 rounded-lg hover:bg-brand-light transition-colors font-semibold border-2 border-brand-primary">
-                    <i class="fas fa-sync-alt mr-2"></i>Load More Jobs
-                </button>
             </div>
             <div class="text-center mt-8">
                 <a href="jobs/find-jobs.html" class="inline-block bg-brand-primary text-white px-8 py-3 rounded-lg hover:bg-brand-secondary transition-colors">
@@ -240,16 +264,16 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer class="bg-gray-900 text-white mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
                 <div>
-                    <h3 class="text-xl font-bold mb-4">City Maid Services</h3>
-                    <p class="text-gray-400">Connecting households with reliable domestic help</p>
+                    <h3 class="text-2xl font-bold mb-6">City Maid Services</h3>
+                    <p class="text-gray-400 leading-relaxed">Connecting trusted domestic help with employers in Nepal</p>
                 </div>
                 <div>
-                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
-                    <ul class="space-y-2">
+                    <h3 class="text-xl font-bold mb-6">Quick Links</h3>
+                    <ul class="space-y-4">
                         <li><a href="jobs/find-maids.html" class="text-gray-400 hover:text-white transition-colors">Find Maids</a></li>
                         <li><a href="jobs/find-jobs.html" class="text-gray-400 hover:text-white transition-colors">Find Jobs</a></li>
                         <li><a href="profile/create-profile.html" class="text-gray-400 hover:text-white transition-colors">Create Profile</a></li>
@@ -257,39 +281,33 @@
                     </ul>
                 </div>
                 <div>
-                    <h4 class="text-lg font-semibold mb-4">Support</h4>
-                    <ul class="space-y-2">
-                        <li><a href="static/contact.html" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
-                        <li><a href="static/about.html" class="text-gray-400 hover:text-white transition-colors">About Us</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                    <h3 class="text-xl font-bold mb-6">Legal</h3>
+                    <ul class="space-y-4">
+                        <li><a href="static/privacy-policy.html" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="static/terms-of-service.html" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="static/refund-policy.html" class="text-gray-400 hover:text-white transition-colors">Refund Policy</a></li>
+                        <li><a href="static/cookie-policy.html" class="text-gray-400 hover:text-white transition-colors">Cookie Policy</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="text-lg font-semibold mb-4">Connect With Us</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fab fa-facebook text-2xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fab fa-twitter text-2xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fab fa-instagram text-2xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fab fa-linkedin text-2xl"></i>
-                        </a>
-                    </div>
+                    <h3 class="text-xl font-bold mb-6">Contact Info</h3>
+                    <p class="text-gray-400 mb-2">Address: Talchhikhel 15, Satdobato, Lalitpur, Nepal</p>
+                    <p class="text-gray-400 mb-4">Email: info@citymaidservices.net</p>
+                    <p class="text-gray-400">Phone: +977-9841317273</p>
                 </div>
             </div>
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
-                <p class="text-gray-400">&copy; 2024 City Maid Services. All rights reserved.</p>
+        </div>
+        <div class="border-t border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <p class="text-center text-gray-400">&copy; <span id="currentYear"></span> City Maid Services. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script>
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
         // Initialize Supabase
         const supabaseUrl = 'https://fdgqqxyyofjnkhswkwcq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZ3FxeHl5b2Zqbmtoc3drd2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMjQyMTMsImV4cCI6MjA1OTYwMDIxM30.YyJLLu3r2a7Mh7ny0ie-YzzLfPh5PdrJJHnBFBxWqVE';
@@ -373,13 +391,11 @@
         }
 
         // Load maids with pagination
-        async function loadLatestMaids(loadMore = false) {
+        async function loadLatestMaids() {
             const container = document.getElementById('latestMaidsContainer');
             const loadMoreBtn = document.getElementById('loadMoreMaids');
             
-            if (!loadMore) {
-                showLoading(container);
-            }
+            showLoading(container);
 
             try {
                 const { data: maids, error } = await supabase
@@ -387,7 +403,7 @@
                     .select('*')
                     .eq('is_active', true)
                     .order('created_at', { ascending: false })
-                    .range(currentMaidPage * itemsPerPage, (currentMaidPage + 1) * itemsPerPage - 1);
+                    .limit(6); // Show only 6 profiles
 
                 if (error) throw error;
 
@@ -400,16 +416,7 @@
                             <p class="text-gray-500">No profiles available at the moment</p>
                         </div>
                     `;
-                    loadMoreBtn.classList.add('hidden');
                     return;
-                }
-
-                if (maids.length < itemsPerPage) {
-                    hasMoreMaids = false;
-                    loadMoreBtn.classList.add('hidden');
-                } else {
-                    hasMoreMaids = true;
-                    loadMoreBtn.classList.remove('hidden');
                 }
 
                 const maidsHTML = maids.map(maid => `
@@ -464,29 +471,21 @@
                     </div>
                 `).join('');
 
-                if (loadMore) {
-                    container.innerHTML += maidsHTML;
-                } else {
-                    container.innerHTML = maidsHTML;
-                }
+                container.innerHTML = maidsHTML;
 
             } catch (error) {
                 console.error('Error loading maids:', error);
-                if (!loadMore) {
-                    showError(container, 'Error loading profiles. Please try again later.');
-                }
+                showError(container, 'Error loading profiles. Please try again later.');
                 showNotification('Failed to load profiles', 'error');
             }
         }
 
         // Load jobs with pagination
-        async function loadLatestJobs(loadMore = false) {
+        async function loadLatestJobs() {
             const container = document.getElementById('latestJobsContainer');
             const loadMoreBtn = document.getElementById('loadMoreJobs');
             
-            if (!loadMore) {
-                showLoading(container);
-            }
+            showLoading(container);
 
             try {
                 const { data: jobs, error } = await supabase
@@ -494,7 +493,7 @@
                     .select('*')
                     .eq('is_active', true)
                     .order('created_at', { ascending: false })
-                    .range(currentJobPage * itemsPerPage, (currentJobPage + 1) * itemsPerPage - 1);
+                    .limit(6); // Show only 6 jobs
 
                 if (error) throw error;
 
@@ -507,16 +506,7 @@
                             <p class="text-gray-500">No jobs available at the moment</p>
                         </div>
                     `;
-                    loadMoreBtn.classList.add('hidden');
                     return;
-                }
-
-                if (jobs.length < itemsPerPage) {
-                    hasMoreJobs = false;
-                    loadMoreBtn.classList.add('hidden');
-                } else {
-                    hasMoreJobs = true;
-                    loadMoreBtn.classList.remove('hidden');
                 }
 
                 const jobsHTML = jobs.map(job => `
@@ -565,17 +555,11 @@
                     </div>
                 `).join('');
 
-                if (loadMore) {
-                    container.innerHTML += jobsHTML;
-                } else {
-                    container.innerHTML = jobsHTML;
-                }
+                container.innerHTML = jobsHTML;
 
             } catch (error) {
                 console.error('Error loading jobs:', error);
-                if (!loadMore) {
-                    showError(container, 'Error loading jobs. Please try again later.');
-                }
+                showError(container, 'Error loading jobs. Please try again later.');
                 showNotification('Failed to load jobs', 'error');
             }
         }
@@ -584,7 +568,92 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadLatestMaids();
             loadLatestJobs();
+            updateCategoryCounts();
         });
+
+        // Update category counts
+        async function updateCategoryCounts() {
+            try {
+                // Get maids counts
+                const { data: maidsCounts, error: maidsError } = await supabase
+                    .from('maids')
+                    .select('services')
+                    .eq('is_active', true);
+
+                if (maidsError) throw maidsError;
+
+                // Get jobs counts
+                const { data: jobsCounts, error: jobsError } = await supabase
+                    .from('jobs')
+                    .select('services')
+                    .eq('is_active', true);
+
+                if (jobsError) throw jobsError;
+
+                // Count maids by service type
+                const maidsByService = {
+                    cook: 0,
+                    cleaner: 0,
+                    childcare: 0,
+                    elderly: 0,
+                    other: 0
+                };
+
+                // Count jobs by service type
+                const jobsByService = {
+                    cook: 0,
+                    cleaner: 0,
+                    childcare: 0,
+                    elderly: 0,
+                    other: 0
+                };
+
+                // Count maids by service
+                maidsCounts.forEach(maid => {
+                    if (maid.services) {
+                        maid.services.forEach(service => {
+                            const serviceLower = service.toLowerCase();
+                            if (serviceLower.includes('cook')) maidsByService.cook++;
+                            else if (serviceLower.includes('clean')) maidsByService.cleaner++;
+                            else if (serviceLower.includes('child') || serviceLower.includes('baby')) maidsByService.childcare++;
+                            else if (serviceLower.includes('elderly') || serviceLower.includes('old')) maidsByService.elderly++;
+                            else maidsByService.other++;
+                        });
+                    }
+                });
+
+                // Count jobs by service
+                jobsCounts.forEach(job => {
+                    if (job.services) {
+                        job.services.forEach(service => {
+                            const serviceLower = service.toLowerCase();
+                            if (serviceLower.includes('cook')) jobsByService.cook++;
+                            else if (serviceLower.includes('clean')) jobsByService.cleaner++;
+                            else if (serviceLower.includes('child') || serviceLower.includes('baby')) jobsByService.childcare++;
+                            else if (serviceLower.includes('elderly') || serviceLower.includes('old')) jobsByService.elderly++;
+                            else jobsByService.other++;
+                        });
+                    }
+                });
+
+                // Update maids counts
+                document.getElementById('cookCount').textContent = maidsByService.cook;
+                document.getElementById('cleanerCount').textContent = maidsByService.cleaner;
+                document.getElementById('childcareCount').textContent = maidsByService.childcare;
+                document.getElementById('elderlyCount').textContent = maidsByService.elderly;
+                document.getElementById('otherCount').textContent = maidsByService.other;
+
+                // Update jobs counts
+                document.getElementById('cookJobsCount').textContent = jobsByService.cook;
+                document.getElementById('cleanerJobsCount').textContent = jobsByService.cleaner;
+                document.getElementById('childcareJobsCount').textContent = jobsByService.childcare;
+                document.getElementById('elderlyJobsCount').textContent = jobsByService.elderly;
+                document.getElementById('otherJobsCount').textContent = jobsByService.other;
+
+            } catch (error) {
+                console.error('Error updating category counts:', error);
+            }
+        }
 
         // Mobile menu functionality
         document.addEventListener('DOMContentLoaded', function() {
