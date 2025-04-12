@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings - CityMaid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#4F46E5',
+                            secondary: '#4338CA',
+                            light: '#EEF2FF',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .settings-card {
+            @apply bg-white rounded-xl p-6 border border-gray-100 hover:border-indigo-100 transition-all duration-300;
+        }
+        .nav-link {
+            @apply px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center;
+        }
+        .nav-link.active {
+            @apply bg-brand-light text-brand-primary font-semibold;
+        }
+        .input-group {
+            @apply mb-6;
+        }
+        .input-label {
+            @apply block text-sm font-medium text-gray-700 mb-2;
+        }
+        .input-field {
+            @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary;
+        }
+        .save-button {
+            @apply bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary transition-colors font-semibold;
+        }
+        .cancel-button {
+            @apply bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-poppins">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-3xl font-bold text-brand-primary tracking-tight">City<span class="text-brand-secondary">Maid</span></a>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Home</a>
+                    <a href="find-maids.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Find Maids</a>
+                    <a href="find-jobs.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Find Jobs</a>
+                    <a href="dashboard.html" class="text-gray-700 hover:text-brand-primary font-medium transition-colors">Dashboard</a>
+                    <div id="userMenu" class="relative">
+                        <button class="flex items-center space-x-2 text-gray-700 hover:text-brand-primary">
+                            <img id="userAvatar" src="https://via.placeholder.com/32" class="w-8 h-8 rounded-full">
+                            <span id="userName">Loading...</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Profile Settings</h1>
+                <p class="text-gray-600">Manage your account settings and preferences</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Settings Navigation -->
+                <div class="md:col-span-1">
+                    <div class="settings-card">
+                        <nav class="space-y-2">
+                            <a href="#personal" class="nav-link active" data-section="personal">
+                                <i class="fas fa-user-circle w-5 mr-2"></i>
+                                Personal Information
+                            </a>
+                            <a href="#contact" class="nav-link" data-section="contact">
+                                <i class="fas fa-address-book w-5 mr-2"></i>
+                                Contact Details
+                            </a>
+                            <a href="#preferences" class="nav-link" data-section="preferences">
+                                <i class="fas fa-cog w-5 mr-2"></i>
+                                Preferences
+                            </a>
+                            <a href="#notifications" class="nav-link" data-section="notifications">
+                                <i class="fas fa-bell w-5 mr-2"></i>
+                                Notifications
+                            </a>
+                            <a href="#privacy" class="nav-link" data-section="privacy">
+                                <i class="fas fa-shield-alt w-5 mr-2"></i>
+                                Privacy
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Settings Content -->
+                <div class="md:col-span-3 space-y-8">
+                    <!-- Personal Information -->
+                    <div id="personal" class="settings-card">
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">Personal Information</h2>
+                        <form id="personalForm" class="space-y-6">
+                            <div class="flex items-center mb-6">
+                                <div class="mr-6">
+                                    <img id="avatarPreview" src="https://via.placeholder.com/100" 
+                                         class="w-24 h-24 rounded-full object-cover">
+                                </div>
+                                <div>
+                                    <label class="save-button cursor-pointer">
+                                        <input type="file" id="avatarInput" class="hidden" accept="image/*">
+                                        Change Photo
+                                    </label>
+                                    <p class="text-sm text-gray-500 mt-2">Maximum file size: 2MB</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="input-group">
+                                    <label for="fullName" class="input-label">Full Name</label>
+                                    <input type="text" id="fullName" class="input-field" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="displayName" class="input-label">Display Name</label>
+                                    <input type="text" id="displayName" class="input-field">
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="bio" class="input-label">Bio</label>
+                                <textarea id="bio" class="input-field" rows="3"></textarea>
+                            </div>
+                            <div class="flex justify-end space-x-4">
+                                <button type="button" class="cancel-button">Cancel</button>
+                                <button type="submit" class="save-button">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Contact Details -->
+                    <div id="contact" class="settings-card hidden">
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">Contact Details</h2>
+                        <form id="contactForm" class="space-y-6">
+                            <div class="input-group">
+                                <label for="email" class="input-label">Email Address</label>
+                                <input type="email" id="email" class="input-field" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="phone" class="input-label">Phone Number</label>
+                                <input type="tel" id="phone" class="input-field" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="address" class="input-label">Address</label>
+                                <textarea id="address" class="input-field" rows="3"></textarea>
+                            </div>
+                            <div class="flex justify-end space-x-4">
+                                <button type="button" class="cancel-button">Cancel</button>
+                                <button type="submit" class="save-button">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Preferences -->
+                    <div id="preferences" class="settings-card hidden">
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">Preferences</h2>
+                        <form id="preferencesForm" class="space-y-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-medium text-gray-900">Language</h3>
+                                        <p class="text-sm text-gray-500">Select your preferred language</p>
+                                    </div>
+                                    <select class="input-field w-48">
+                                        <option value="en">English</option>
+                                        <option value="ne">Nepali</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-medium text-gray-900">Time Zone</h3>
+                                        <p class="text-sm text-gray-500">Set your local time zone</p>
+                                    </div>
+                                    <select class="input-field w-48">
+                                        <option value="NPT">Nepal Time (NPT)</option>
+                                        <option value="UTC">UTC</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-4">
+                                <button type="button" class="cancel-button">Cancel</button>
+                                <button type="submit" class="save-button">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Notifications -->
+                    <div id="notifications" class="settings-card hidden">
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">Notification Settings</h2>
+                        <form id="notificationsForm" class="space-y-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-medium text-gray-900">Email Notifications</h3>
+                                        <p class="text-sm text-gray-500">Receive updates via email</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-light rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-primary"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-medium text-gray-900">SMS Notifications</h3>
+                                        <p class="text-sm text-gray-500">Receive updates via SMS</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-light rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-primary"></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-4">
+                                <button type="button" class="cancel-button">Cancel</button>
+                                <button type="submit" class="save-button">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Privacy -->
+                    <div id="privacy" class="settings-card hidden">
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">Privacy Settings</h2>
+                        <form id="privacyForm" class="space-y-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-medium text-gray-900">Profile Visibility</h3>
+                                        <p class="text-sm text-gray-500">Control who can see your profile</p>
+                                    </div>
+                                    <select class="input-field w-48">
+                                        <option value="public">Public</option>
+                                        <option value="private">Private</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h3 class="font-medium text-gray-900">Contact Information</h3>
+                                        <p class="text-sm text-gray-500">Show contact info to verified users</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-light rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-primary"></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-4">
+                                <button type="button" class="cancel-button">Cancel</button>
+                                <button type="submit" class="save-button">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Supabase Client
+        const supabaseUrl = 'https://fdgqqxyyofjnkhswkwcq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZ3FxeHl5b2Zqbmtoc3drd2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMjQyMTMsImV4cCI6MjA1OTYwMDIxM30.YyJLLu3r2a7Mh7ny0ie-YzzLfPh5PdrJJHnBFBxWqVE';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Load user data
+        async function loadUserData() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    window.location.href = 'signin.html';
+                    return;
+                }
+
+                document.getElementById('userName').textContent = user.email.split('@')[0];
+
+                // Load profile data
+                const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                if (error) throw error;
+
+                if (profile) {
+                    // Update form fields
+                    document.getElementById('fullName').value = profile.full_name || '';
+                    document.getElementById('displayName').value = profile.display_name || '';
+                    document.getElementById('bio').value = profile.bio || '';
+                    document.getElementById('email').value = profile.email || user.email;
+                    document.getElementById('phone').value = profile.phone || '';
+                    document.getElementById('address').value = profile.address || '';
+
+                    // Update avatar
+                    if (profile.avatar_url) {
+                        document.getElementById('avatarPreview').src = profile.avatar_url;
+                        document.getElementById('userAvatar').src = profile.avatar_url;
+                    }
+                }
+
+                return user;
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                return null;
+            }
+        }
+
+        // Handle avatar upload
+        async function handleAvatarUpload(file) {
+            try {
+                if (file.size > 2 * 1024 * 1024) {
+                    throw new Error('File size must be less than 2MB');
+                }
+
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}.${fileExt}`;
+                const filePath = `avatars/${fileName}`;
+
+                // Upload file to Supabase Storage
+                const { error: uploadError } = await supabase.storage
+                    .from('profiles')
+                    .upload(filePath, file);
+
+                if (uploadError) throw uploadError;
+
+                // Get public URL
+                const { data: { publicUrl } } = supabase.storage
+                    .from('profiles')
+                    .getPublicUrl(filePath);
+
+                // Update profile with new avatar URL
+                const { error: updateError } = await supabase
+                    .from('profiles')
+                    .update({ avatar_url: publicUrl })
+                    .eq('id', (await supabase.auth.getUser()).data.user.id);
+
+                if (updateError) throw updateError;
+
+                // Update preview
+                document.getElementById('avatarPreview').src = publicUrl;
+                document.getElementById('userAvatar').src = publicUrl;
+
+            } catch (error) {
+                console.error('Error uploading avatar:', error);
+                alert(error.message);
+            }
+        }
+
+        // Handle form submissions
+        async function handleFormSubmit(formId, data) {
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update(data)
+                    .eq('id', (await supabase.auth.getUser()).data.user.id);
+
+                if (error) throw error;
+
+                alert('Changes saved successfully!');
+            } catch (error) {
+                console.error(`Error saving ${formId}:`, error);
+                alert('Failed to save changes. Please try again.');
+            }
+        }
+
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Update active state
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                // Show selected section
+                document.querySelectorAll('.settings-card').forEach(card => card.classList.add('hidden'));
+                document.getElementById(link.dataset.section).classList.remove('hidden');
+            });
+        });
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', loadUserData);
+
+        document.getElementById('avatarInput').addEventListener('change', (e) => {
+            if (e.target.files?.[0]) {
+                handleAvatarUpload(e.target.files[0]);
+            }
+        });
+
+        // Form submissions
+        document.getElementById('personalForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                full_name: document.getElementById('fullName').value,
+                display_name: document.getElementById('displayName').value,
+                bio: document.getElementById('bio').value
+            };
+            await handleFormSubmit('personalForm', data);
+        });
+
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value
+            };
+            await handleFormSubmit('contactForm', data);
+        });
+
+        document.getElementById('preferencesForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                language: e.target.querySelector('select[value]').value,
+                timezone: e.target.querySelectorAll('select')[1].value
+            };
+            await handleFormSubmit('preferencesForm', data);
+        });
+
+        document.getElementById('notificationsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                email_notifications: e.target.querySelector('input[type="checkbox"]').checked,
+                sms_notifications: e.target.querySelectorAll('input[type="checkbox"]')[1].checked
+            };
+            await handleFormSubmit('notificationsForm', data);
+        });
+
+        document.getElementById('privacyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                profile_visibility: e.target.querySelector('select').value,
+                show_contact_info: e.target.querySelector('input[type="checkbox"]').checked
+            };
+            await handleFormSubmit('privacyForm', data);
+        });
+
+        // Cancel buttons
+        document.querySelectorAll('.cancel-button').forEach(button => {
+            button.addEventListener('click', () => {
+                loadUserData();
+            });
+        });
+    </script>
+</body>
+</html>
