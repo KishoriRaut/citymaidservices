@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Payments - City Maid</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Supabase Configuration -->
+    <script src="supabase-config.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-primary': '#0056B3',
+                        'brand-secondary': '#003D82',
+                        'brand-light': '#E6F0FF'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="hidden md:flex md:flex-shrink-0">
+            <div class="flex flex-col w-64">
+                <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r">
+                    <div class="flex flex-col flex-shrink-0 px-4">
+                        <a href="../index.html" class="text-3xl font-bold text-brand-primary tracking-tight">City<span class="text-brand-secondary">Maid</span></a>
+                    </div>
+                    <div class="flex flex-col flex-grow px-4 mt-5">
+                        <nav class="flex-1 space-y-1">
+                            <a href="admin-dashboard.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-chart-line mr-3 text-brand-primary"></i>
+                                Dashboard
+                            </a>
+                            <a href="manage-users.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-users mr-3 text-brand-primary"></i>
+                                Manage Users
+                            </a>
+                            <a href="manage-jobs.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-briefcase mr-3 text-brand-primary"></i>
+                                Manage Jobs
+                            </a>
+                            <a href="manage-maids.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-broom mr-3 text-brand-primary"></i>
+                                Manage Maids
+                            </a>
+                            <a href="manage-payments.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-brand-light text-brand-primary group">
+                                <i class="fas fa-credit-card mr-3"></i>
+                                Manage Payments
+                            </a>
+                            <a href="settings.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-cog mr-3 text-brand-primary"></i>
+                                Settings
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main content area -->
+        <div class="flex flex-col flex-1 overflow-hidden">
+            <!-- Top bar -->
+            <header class="flex-shrink-0 relative h-16 bg-white flex items-center shadow-sm">
+                <button type="button" class="px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-primary md:hidden" id="mobile-menu-button">
+                    <span class="sr-only">Open sidebar</span>
+                    <i class="fas fa-bars h-6 w-6"></i>
+                </button>
+
+                <div class="flex-1 px-4 flex justify-between">
+                    <div class="flex-1 flex">
+                        <h1 class="text-2xl font-semibold text-gray-900">Manage Payments</h1>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main content -->
+            <main class="flex-1 relative overflow-y-auto focus:outline-none">
+                <div class="py-6">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        <!-- Statistics Cards -->
+                        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                            <!-- Total Revenue -->
+                            <div class="bg-white overflow-hidden shadow rounded-lg">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-dollar-sign text-3xl text-brand-primary"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Total Revenue</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-semibold text-gray-900" id="total-revenue">$0.00</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Today's Revenue -->
+                            <div class="bg-white overflow-hidden shadow rounded-lg">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-calendar-day text-3xl text-brand-primary"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Today's Revenue</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-semibold text-gray-900" id="today-revenue">$0.00</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pending Payments -->
+                            <div class="bg-white overflow-hidden shadow rounded-lg">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-clock text-3xl text-brand-primary"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Pending Payments</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-semibold text-gray-900" id="pending-payments">0</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Successful Payments -->
+                            <div class="bg-white overflow-hidden shadow rounded-lg">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-check-circle text-3xl text-brand-primary"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Successful Payments</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-semibold text-gray-900" id="successful-payments">0</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="mt-8 bg-white shadow rounded-lg">
+                            <div class="px-4 py-5 sm:p-6">
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                    <div>
+                                        <label for="status-filter" class="block text-sm font-medium text-gray-700">Payment Status</label>
+                                        <select id="status-filter" name="status-filter" 
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm">
+                                            <option value="all">All Statuses</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="completed">Completed</option>
+                                            <option value="failed">Failed</option>
+                                            <option value="refunded">Refunded</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="date-filter" class="block text-sm font-medium text-gray-700">Date Range</label>
+                                        <select id="date-filter" name="date-filter" 
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm">
+                                            <option value="all">All Time</option>
+                                            <option value="today">Today</option>
+                                            <option value="week">Last 7 Days</option>
+                                            <option value="month">Last 30 Days</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="search-input" class="block text-sm font-medium text-gray-700">Search</label>
+                                        <input type="text" id="search-input" name="search-input" 
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                            placeholder="Search by ID, user, or amount">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payments Table -->
+                        <div class="mt-8 bg-white shadow rounded-lg">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction ID</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="payments-table-body" class="bg-white divide-y divide-gray-200">
+                                        <!-- Payments will be dynamically inserted here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Export Button -->
+                        <div class="mt-4 flex justify-end">
+                            <button type="button" onclick="exportPaymentsToCSV()" 
+                                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-primary hover:bg-brand-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary">
+                                <i class="fas fa-file-export mr-2"></i>
+                                Export CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Payment Details Modal -->
+    <div id="payment-modal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                Payment Details
+                            </h3>
+                            <div class="mt-4 space-y-4" id="payment-details">
+                                <!-- Payment details will be dynamically inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        onclick="closePaymentModal()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Payments page loaded');
+            
+            // Initialize Supabase client
+            if (!window.supabaseClient) {
+                try {
+                    console.log('Initializing Supabase client...');
+                    window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    console.log('Supabase client initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing Supabase client:', error);
+                    showErrorMessage('Failed to initialize database connection');
+                    return;
+                }
+            }
+
+            // Set up event listeners
+            const searchInput = document.getElementById('search-input');
+            const statusFilter = document.getElementById('status-filter');
+            const dateFilter = document.getElementById('date-filter');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(fetchPayments, 300));
+                console.log('Search input event listener added');
+            }
+            
+            if (statusFilter) {
+                statusFilter.addEventListener('change', fetchPayments);
+                console.log('Status filter event listener added');
+            }
+            
+            if (dateFilter) {
+                dateFilter.addEventListener('change', fetchPayments);
+                console.log('Date filter event listener added');
+            }
+
+            // Initial fetch
+            console.log('Fetching payments initially...');
+            await fetchPayments();
+        });
+
+        // Debounce function for search input
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Function to fetch payments from Supabase
+        async function fetchPayments() {
+            try {
+                console.log('Fetching payments...');
+                const paymentsTableBody = document.getElementById('payments-table-body');
+                const statusFilter = document.getElementById('status-filter');
+                const dateFilter = document.getElementById('date-filter');
+                const searchInput = document.getElementById('search-input');
+
+                if (!paymentsTableBody || !statusFilter || !dateFilter || !searchInput) {
+                    console.error('Required elements not found');
+                    return;
+                }
+
+                // Show loading state
+                paymentsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                            <i class="fas fa-spinner fa-spin mr-2"></i> Loading payments...
+                        </td>
+                    </tr>
+                `;
+
+                // Get filter values
+                const status = statusFilter.value;
+                const date = dateFilter.value;
+                const searchTerm = searchInput.value.toLowerCase();
+
+                // Build query
+                let query = supabaseClient
+                    .from('payments')
+                    .select(`
+                        id,
+                        user_id,
+                        users (full_name, email),
+                        amount,
+                        payment_method,
+                        status,
+                        created_at,
+                        transaction_id,
+                        description,
+                        contact_id,
+                        contacts (job_id, maid_id)
+                    `)
+                    .order('created_at', { ascending: false });
+
+                // Apply filters
+                if (status !== 'all') {
+                    query = query.eq('status', status);
+                }
+
+                if (date !== 'all') {
+                    const now = new Date();
+                    let startDate = new Date();
+                    
+                    switch(date) {
+                        case 'today':
+                            startDate.setHours(0, 0, 0, 0);
+                            break;
+                        case 'week':
+                            startDate.setDate(now.getDate() - 7);
+                            break;
+                        case 'month':
+                            startDate.setMonth(now.getMonth() - 1);
+                            break;
+                    }
+                    
+                    query = query.gte('created_at', startDate.toISOString());
+                }
+
+                const { data: payments, error } = await query;
+
+                if (error) {
+                    console.error('Error fetching payments:', error);
+                    throw error;
+                }
+
+                console.log('Fetched payments:', payments);
+
+                // Filter payments based on search term
+                const filteredPayments = payments.filter(payment => 
+                    payment.id.toString().includes(searchTerm) ||
+                    payment.users?.full_name?.toLowerCase().includes(searchTerm) ||
+                    payment.users?.email?.toLowerCase().includes(searchTerm) ||
+                    payment.amount.toString().includes(searchTerm)
+                );
+
+                // Update statistics
+                updatePaymentStatistics(filteredPayments);
+
+                // Update table
+                if (!filteredPayments || filteredPayments.length === 0) {
+                    paymentsTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                No payments found
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                paymentsTableBody.innerHTML = filteredPayments.map(payment => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${payment.transaction_id || payment.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${payment.users?.full_name || 'Unknown User'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${payment.amount.toFixed(2)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${payment.payment_method}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(payment.status)}">
+                                ${payment.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${new Date(payment.created_at).toLocaleDateString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div class="flex space-x-2">
+                                <button onclick="viewPayment('${payment.id}')" class="text-blue-600 hover:text-blue-900">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                ${payment.status === 'pending' ? `
+                                <button onclick="updatePaymentStatus('${payment.id}', 'completed')" class="text-green-600 hover:text-green-900">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                ` : ''}
+                                ${payment.status === 'completed' ? `
+                                <button onclick="updatePaymentStatus('${payment.id}', 'refunded')" class="text-yellow-600 hover:text-yellow-900">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error in fetchPayments:', error);
+                const paymentsTableBody = document.getElementById('payments-table-body');
+                if (paymentsTableBody) {
+                    paymentsTableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Error loading payments</td></tr>';
+                }
+            }
+        }
+
+        // Function to get status color
+        function getStatusColor(status) {
+            switch(status) {
+                case 'completed':
+                    return 'bg-green-100 text-green-800';
+                case 'pending':
+                    return 'bg-yellow-100 text-yellow-800';
+                case 'failed':
+                    return 'bg-red-100 text-red-800';
+                case 'refunded':
+                    return 'bg-gray-100 text-gray-800';
+                default:
+                    return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        // Function to update payment statistics
+        function updatePaymentStatistics(payments) {
+            const totalRevenue = document.getElementById('total-revenue');
+            const todayRevenue = document.getElementById('today-revenue');
+            const pendingPayments = document.getElementById('pending-payments');
+            const successfulPayments = document.getElementById('successful-payments');
+
+            if (payments) {
+                // Calculate total revenue
+                const total = payments.reduce((sum, payment) => sum + payment.amount, 0);
+                totalRevenue.textContent = `$${total.toFixed(2)}`;
+
+                // Calculate today's revenue
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todayTotal = payments
+                    .filter(payment => new Date(payment.created_at) >= today)
+                    .reduce((sum, payment) => sum + payment.amount, 0);
+                todayRevenue.textContent = `$${todayTotal.toFixed(2)}`;
+
+                // Count pending payments
+                const pending = payments.filter(payment => payment.status === 'pending').length;
+                pendingPayments.textContent = pending;
+
+                // Count successful payments
+                const successful = payments.filter(payment => payment.status === 'completed').length;
+                successfulPayments.textContent = successful;
+            }
+        }
+
+        // Function to view payment details
+        async function viewPayment(paymentId) {
+            try {
+                console.log('Viewing payment:', paymentId);
+                const { data: payment, error } = await supabaseClient
+                    .from('payments')
+                    .select(`
+                        id,
+                        user_id,
+                        users (full_name, email),
+                        amount,
+                        payment_method,
+                        status,
+                        created_at,
+                        transaction_id,
+                        description,
+                        contact_id,
+                        contacts (job_id, maid_id)
+                    `)
+                    .eq('id', paymentId)
+                    .single();
+
+                if (error) {
+                    console.error('Error fetching payment details:', error);
+                    throw error;
+                }
+
+                console.log('Payment details fetched:', payment);
+
+                // Get job or maid details
+                let itemDetails = null;
+                if (payment.contacts) {
+                    if (payment.contacts.job_id) {
+                        const { data: job } = await supabaseClient
+                            .from('jobs')
+                            .select('owner_name, location, type')
+                            .eq('id', payment.contacts.job_id)
+                            .single();
+                        itemDetails = job;
+                    } else if (payment.contacts.maid_id) {
+                        const { data: maid } = await supabaseClient
+                            .from('maids')
+                            .select('full_name, location, services')
+                            .eq('id', payment.contacts.maid_id)
+                            .single();
+                        itemDetails = maid;
+                    }
+                }
+
+                // Show the modal with payment details
+                const modal = document.getElementById('payment-modal');
+                const modalTitle = document.getElementById('modal-title');
+                const paymentDetails = document.getElementById('payment-details');
+
+                modalTitle.textContent = 'Payment Details';
+
+                paymentDetails.innerHTML = `
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Transaction ID</h4>
+                            <p class="mt-1 text-sm text-gray-900">${payment.transaction_id || payment.id}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Date</h4>
+                            <p class="mt-1 text-sm text-gray-900">${new Date(payment.created_at).toLocaleString()}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">User</h4>
+                            <p class="mt-1 text-sm text-gray-900">${payment.users?.full_name || 'Unknown User'}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Email</h4>
+                            <p class="mt-1 text-sm text-gray-900">${payment.users?.email || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Amount</h4>
+                            <p class="mt-1 text-sm text-gray-900">$${payment.amount.toFixed(2)}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Payment Method</h4>
+                            <p class="mt-1 text-sm text-gray-900">${payment.payment_method}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Status</h4>
+                            <p class="mt-1 text-sm text-gray-900">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(payment.status)}">
+                                    ${payment.status}
+                                </span>
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Description</h4>
+                            <p class="mt-1 text-sm text-gray-900">${payment.description || 'Contact Unlock'}</p>
+                        </div>
+                    </div>
+                    ${itemDetails ? `
+                    <div class="mt-4">
+                        <h4 class="text-sm font-medium text-gray-500">Item Details</h4>
+                        <div class="mt-1 text-sm text-gray-900">
+                            ${itemDetails.owner_name ? `
+                                <p><strong>Job Owner:</strong> ${itemDetails.owner_name}</p>
+                                <p><strong>Location:</strong> ${itemDetails.location}</p>
+                                <p><strong>Job Type:</strong> ${itemDetails.type}</p>
+                            ` : `
+                                <p><strong>Maid Name:</strong> ${itemDetails.full_name}</p>
+                                <p><strong>Location:</strong> ${itemDetails.location}</p>
+                                <p><strong>Services:</strong> ${itemDetails.services.join(', ')}</p>
+                            `}
+                        </div>
+                    </div>
+                    ` : ''}
+                `;
+
+                modal.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error viewing payment:', error);
+                showErrorMessage('Error loading payment details: ' + error.message);
+            }
+        }
+
+        // Function to update payment status
+        async function updatePaymentStatus(paymentId, newStatus) {
+            try {
+                console.log('Updating payment status:', paymentId, 'to', newStatus);
+                const { error } = await supabaseClient
+                    .from('payments')
+                    .update({ status: newStatus })
+                    .eq('id', paymentId);
+
+                if (error) {
+                    console.error('Error updating payment status:', error);
+                    throw error;
+                }
+
+                showSuccessMessage(`Payment status updated to ${newStatus}`);
+                await fetchPayments();
+            } catch (error) {
+                console.error('Error updating payment status:', error);
+                showErrorMessage('Error updating payment status: ' + error.message);
+            }
+        }
+
+        // Function to close payment modal
+        function closePaymentModal() {
+            const modal = document.getElementById('payment-modal');
+            modal.classList.add('hidden');
+        }
+
+        // Function to export payments to CSV
+        async function exportPaymentsToCSV() {
+            try {
+                // Fetch complete payment data from Supabase
+                const { data: payments, error } = await supabaseClient
+                    .from('payments')
+                    .select(`
+                        id,
+                        user_id,
+                        users (full_name, email),
+                        amount,
+                        payment_method,
+                        status,
+                        created_at,
+                        transaction_id,
+                        description,
+                        contact_id
+                    `);
+
+                if (error) throw error;
+
+                // Create CSV headers
+                const headers = [
+                    'Transaction ID',
+                    'User Name',
+                    'User Email',
+                    'Amount',
+                    'Payment Method',
+                    'Status',
+                    'Date',
+                    'Description'
+                ];
+
+                // Create CSV rows
+                const rows = payments.map(payment => [
+                    payment.transaction_id || payment.id,
+                    payment.users?.full_name || 'Unknown User',
+                    payment.users?.email || 'N/A',
+                    payment.amount.toFixed(2),
+                    payment.payment_method,
+                    payment.status,
+                    new Date(payment.created_at).toLocaleString(),
+                    payment.description || 'Contact Unlock'
+                ]);
+
+                // Combine headers and rows
+                const csvContent = [
+                    headers.join(','),
+                    ...rows.map(row => row.map(cell => {
+                        // Escape quotes and wrap in quotes if contains comma or newline
+                        const cellStr = String(cell || '');
+                        if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+                            return `"${cellStr.replace(/"/g, '""')}"`;
+                        }
+                        return cellStr;
+                    }).join(','))
+                ].join('\n');
+
+                // Create and download the file
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `payments_export_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+                
+                showSuccessMessage('Payments exported to CSV successfully');
+            } catch (error) {
+                console.error('Error exporting payments to CSV:', error);
+                showErrorMessage('Error exporting payments to CSV: ' + error.message);
+            }
+        }
+
+        // Function to show error message
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded';
+            errorDiv.role = 'alert';
+            errorDiv.innerHTML = `
+                <strong class="font-bold">Error!</strong>
+                <span class="block sm:inline">${message}</span>
+            `;
+            document.body.appendChild(errorDiv);
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        // Function to show success message
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded';
+            successDiv.role = 'alert';
+            successDiv.innerHTML = `
+                <strong class="font-bold">Success!</strong>
+                <span class="block sm:inline">${message}</span>
+            `;
+            document.body.appendChild(successDiv);
+            setTimeout(() => {
+                successDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html> 

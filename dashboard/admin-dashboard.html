@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - City Maid</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-primary': '#0056B3',
+                        'brand-secondary': '#003D82',
+                        'brand-light': '#E6F0FF'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Sidebar styling */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            width: 16rem;
+            background-color: white;
+            border-right: 1px solid #e5e7eb;
+        }
+        
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 4rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            background-color: #0056B3;
+        }
+        
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .sidebar-brand span {
+            color: #E6F0FF;
+        }
+        
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .sidebar-user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+        }
+        
+        .sidebar-user-info {
+            margin-left: 0.75rem;
+        }
+        
+        .sidebar-user-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .sidebar-user-role {
+            font-size: 0.75rem;
+            color: #6B7280;
+        }
+        
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 1rem 0.5rem;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #374151;
+            border-radius: 0.375rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-link:hover {
+            background-color: #E6F0FF;
+            color: #0056B3;
+        }
+        
+        .sidebar-link.active {
+            background-color: #E6F0FF;
+            color: #0056B3;
+            border-left: 4px solid #0056B3;
+        }
+        
+        .sidebar-link i {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.75rem;
+        }
+        
+        .sidebar-link span {
+            font-weight: 500;
+        }
+        
+        .sidebar-footer {
+            flex-shrink: 0;
+            display: flex;
+            border-top: 1px solid #e5e7eb;
+            padding: 1rem;
+        }
+        
+        .sidebar-signout {
+            display: flex;
+            align-items: center;
+            color: #374151;
+            transition: color 0.2s;
+        }
+        
+        .sidebar-signout:hover {
+            color: #0056B3;
+        }
+        
+        .sidebar-signout i {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.75rem;
+        }
+        
+        /* Other styles */
+        .stat-card {
+            @apply bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:border-brand-primary transition-all duration-300;
+        }
+        
+        .data-table {
+            @apply min-w-full divide-y divide-gray-200;
+        }
+        
+        .data-table th {
+            @apply px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+        }
+        
+        .data-table td {
+            @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+        }
+        
+        .status-badge {
+            @apply px-2 py-1 text-xs font-medium rounded-full;
+        }
+        
+        .status-badge.success {
+            @apply bg-green-100 text-green-800;
+        }
+        
+        .status-badge.warning {
+            @apply bg-yellow-100 text-yellow-800;
+        }
+        
+        .status-badge.danger {
+            @apply bg-red-100 text-red-800;
+        }
+        
+        .status-badge.info {
+            @apply bg-blue-100 text-blue-800;
+        }
+        
+        .action-button {
+            @apply p-2 text-gray-500 hover:text-brand-primary transition-colors;
+        }
+        
+        .mobile-menu {
+            @apply fixed inset-0 bg-gray-800 bg-opacity-75 z-40 transition-opacity duration-300 ease-in-out;
+        }
+        
+        .mobile-menu-content {
+            @apply fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="hidden md:flex md:flex-shrink-0">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <a href="../index.html" class="sidebar-brand">City<span>Maid</span></a>
+                </div>
+                <div class="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
+                    <div class="sidebar-user">
+                        <img class="sidebar-user-avatar" src="https://ui-avatars.com/api/?name=Admin&background=0056B3&color=fff" alt="Admin">
+                        <div class="sidebar-user-info">
+                            <p class="sidebar-user-name" id="admin-name">Admin</p>
+                            <p class="sidebar-user-role">Administrator</p>
+                        </div>
+                    </div>
+                    <div class="sidebar-nav">
+                        <a href="admin-dashboard.html" class="sidebar-link active">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="manage-users.html" class="sidebar-link">
+                            <i class="fas fa-users"></i>
+                            <span>Users</span>
+                        </a>
+                        <a href="manage-jobs.html" class="sidebar-link">
+                            <i class="fas fa-briefcase"></i>
+                            <span>Jobs</span>
+                        </a>
+                        <a href="manage-maids.html" class="sidebar-link">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Maids</span>
+                        </a>
+                        <a href="manage-payments.html" class="sidebar-link">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Payments</span>
+                        </a>
+                        <a href="settings.html" class="sidebar-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="sidebar-footer">
+                    <a href="../auth/signin.html" class="sidebar-signout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sign out</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex flex-col flex-1 overflow-hidden">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm">
+                <div class="flex items-center justify-between h-16 px-4 sm:px-6">
+                    <div class="flex items-center">
+                        <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-500 hover:text-brand-primary focus:outline-none" title="Toggle Menu">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h1 class="ml-4 text-xl font-semibold text-gray-900">Dashboard</h1>
+                    </div>
+                    <div class="flex items-center">
+                        <button class="p-2 text-gray-500 hover:text-brand-primary focus:outline-none" title="Notifications">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                        <div class="ml-4 relative">
+                            <div class="flex items-center">
+                                <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=Admin&background=0056B3&color=fff" alt="Admin">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto bg-gray-50 p-4 sm:p-6">
+                <!-- Welcome Section -->
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900">Welcome back, <span id="admin-greeting">Admin</span>!</h2>
+                    <p class="text-gray-600">Here's what's happening with your platform today.</p>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-brand-light text-brand-primary">
+                                <i class="fas fa-users text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Total Users</p>
+                                <p class="text-2xl font-semibold text-gray-900" id="total-users">0</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="manage-users.html" class="text-sm text-brand-primary hover:text-brand-secondary">View all users <i class="fas fa-arrow-right ml-1"></i></a>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-user-tie text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Active Maids</p>
+                                <p class="text-2xl font-semibold text-gray-900" id="active-maids">0</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="manage-maids.html" class="text-sm text-brand-primary hover:text-brand-secondary">View all maids <i class="fas fa-arrow-right ml-1"></i></a>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-user-plus text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">New Signups</p>
+                                <p class="text-2xl font-semibold text-gray-900" id="new-signups">0</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="manage-users.html" class="text-sm text-brand-primary hover:text-brand-secondary">View details <i class="fas fa-arrow-right ml-1"></i></a>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                                <i class="fas fa-credit-card text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Payments Collected</p>
+                                <p class="text-2xl font-semibold text-gray-900" id="payments-collected">$0</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a href="manage-payments.html" class="text-sm text-brand-primary hover:text-brand-secondary">View all payments <i class="fas fa-arrow-right ml-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
+                        <div class="space-y-4">
+                            <button onclick="window.location.href='../jobs/post-job.html'" class="w-full px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-secondary transition-colors">
+                                <i class="fas fa-plus mr-2"></i>Post New Job
+                            </button>
+                            <button onclick="window.location.href='../profile/create-profile.html'" class="w-full px-4 py-2 bg-white text-brand-primary border-2 border-brand-primary rounded-lg hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-user-plus mr-2"></i>Create New Profile
+                            </button>
+                            <button onclick="window.location.href='manage-jobs.html'" class="w-full px-4 py-2 bg-white text-brand-primary border-2 border-brand-primary rounded-lg hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-briefcase mr-2"></i>Manage Jobs
+                            </button>
+                            <button onclick="window.location.href='manage-users.html'" class="w-full px-4 py-2 bg-white text-brand-primary border-2 border-brand-primary rounded-lg hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-users mr-2"></i>Manage Users
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900">Recent Activity</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Action</th>
+                                        <th>Details</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="recent-activity">
+                                    <!-- Activity rows will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-6 py-4 border-t border-gray-200">
+                            <a href="#" class="text-sm text-brand-primary hover:text-brand-secondary">View all activity <i class="fas fa-arrow-right ml-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jobs Management Section -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-medium text-gray-900">Recent Jobs</h3>
+                            <div class="flex space-x-4">
+                                <button onclick="window.location.href='manage-jobs.html'" class="text-sm text-brand-primary hover:text-brand-secondary">
+                                    View All Jobs <i class="fas fa-arrow-right ml-1"></i>
+                                </button>
+                                <button onclick="window.location.href='../jobs/post-job.html'" class="text-sm text-brand-primary hover:text-brand-secondary">
+                                    Post New Job <i class="fas fa-plus ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Employer</th>
+                                    <th>Location</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Posted Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="recent-jobs">
+                                <!-- Job rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">User Growth</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 text-xs font-medium rounded-md bg-brand-light text-brand-primary">Week</button>
+                                <button class="px-3 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700">Month</button>
+                                <button class="px-3 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700">Year</button>
+                            </div>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="userGrowthChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Revenue</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 text-xs font-medium rounded-md bg-brand-light text-brand-primary">Week</button>
+                                <button class="px-3 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700">Month</button>
+                                <button class="px-3 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700">Year</button>
+                            </div>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu hidden">
+        <div id="mobile-menu-content" class="mobile-menu-content transform -translate-x-full">
+            <div class="sidebar-header">
+                <a href="../index.html" class="sidebar-brand">City<span>Maid</span></a>
+                <button id="close-mobile-menu" class="text-white ml-auto" title="Close Menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="flex flex-col h-full">
+                <div class="sidebar-user">
+                    <img class="sidebar-user-avatar" src="https://ui-avatars.com/api/?name=Admin&background=0056B3&color=fff" alt="Admin">
+                    <div class="sidebar-user-info">
+                        <p class="sidebar-user-name" id="mobile-admin-name">Admin</p>
+                        <p class="sidebar-user-role">Administrator</p>
+                    </div>
+                </div>
+                <div class="sidebar-nav">
+                    <a href="admin-dashboard.html" class="sidebar-link active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="manage-users.html" class="sidebar-link">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                    </a>
+                    <a href="manage-jobs.html" class="sidebar-link">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Jobs</span>
+                    </a>
+                    <a href="manage-maids.html" class="sidebar-link">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Maids</span>
+                    </a>
+                    <a href="manage-payments.html" class="sidebar-link">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Payments</span>
+                    </a>
+                    <a href="settings.html" class="sidebar-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+                <div class="sidebar-footer">
+                    <a href="../auth/signin.html" class="sidebar-signout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sign out</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://fdgqqxyyofjnkhswkwcq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZ3FxeHl5b2Zqbmtoc3drd2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMjQyMTMsImV4cCI6MjA1OTYwMDIxM30.YyJLLu3r2a7Mh7ny0ie-YzzLfPh5PdrJJHnBFBxWqVE';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Check if user is admin
+        async function checkAdmin() {
+            try {
+                // Check if we're already on the admin dashboard to prevent redirection loops
+                const currentPath = window.location.pathname;
+                if (currentPath.includes('admin-dashboard.html')) {
+                    console.log('Already on admin dashboard, skipping redirection check');
+                    // Load dashboard data
+                    await loadDashboardData();
+                    return;
+                }
+
+                const { data: { session } } = await supabase.auth.getSession();
+                console.log('Current session:', session); // Debug log
+
+                if (!session) {
+                    console.log('No session found, redirecting to signin'); // Debug log
+                    sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+                    window.location.href = '../auth/signin.html';
+                    return;
+                }
+
+                const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .single();
+
+                console.log('User profile:', profile); // Debug log
+
+                if (error) {
+                    console.error('Profile error:', error); // Debug log
+                    throw error;
+                }
+
+                if (!profile || profile.role !== 'admin') {
+                    console.log('User is not admin, redirecting'); // Debug log
+                    if (profile?.role === 'employer') {
+                        window.location.href = 'employer-dashboard.html';
+                    } else if (profile?.role === 'maid') {
+                        window.location.href = 'maid-dashboard.html';
+                    } else {
+                        window.location.href = '../index.html';
+                    }
+                    return;
+                }
+
+                console.log('User is admin, proceeding'); // Debug log
+
+                // Set admin name
+                document.getElementById('admin-name').textContent = profile.full_name || 'Admin';
+                document.getElementById('mobile-admin-name').textContent = profile.full_name || 'Admin';
+                document.getElementById('admin-greeting').textContent = profile.full_name || 'Admin';
+
+                // Load dashboard data
+                await loadDashboardData();
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                window.location.href = '../auth/signin.html';
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                // Load user statistics
+                const { data: users, error: usersError } = await supabase
+                    .from('profiles')
+                    .select('id, created_at');
+
+                if (usersError) throw usersError;
+
+                // Load maid statistics
+                const { data: maids, error: maidsError } = await supabase
+                    .from('maids')
+                    .select('id, is_active');
+
+                if (maidsError) throw maidsError;
+
+                // Load payment statistics
+                const { data: payments, error: paymentsError } = await supabase
+                    .from('payments')
+                    .select('id, amount, status, created_at');
+
+                if (paymentsError) throw paymentsError;
+
+                // Update statistics
+                const totalUsers = users?.length || 0;
+                const activeMaids = maids?.filter(maid => maid.is_active).length || 0;
+                const newSignups = users?.filter(user => {
+                    const signupDate = new Date(user.created_at);
+                    const today = new Date();
+                    const diffTime = Math.abs(today - signupDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    return diffDays <= 7; // Last 7 days
+                }).length || 0;
+                const totalPayments = payments?.reduce((sum, payment) => 
+                    payment.status === 'success' ? sum + payment.amount : sum, 0) || 0;
+
+                document.getElementById('total-users').textContent = totalUsers;
+                document.getElementById('active-maids').textContent = activeMaids;
+                document.getElementById('new-signups').textContent = newSignups;
+                document.getElementById('payments-collected').textContent = `$${totalPayments.toFixed(2)}`;
+
+                // Load recent activity
+                const { data: activities, error: activitiesError } = await supabase
+                    .from('activities')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (activitiesError) throw activitiesError;
+
+                const activityTable = document.getElementById('recent-activity');
+                if (activities && activities.length > 0) {
+                    activityTable.innerHTML = activities.map(activity => `
+                        <tr>
+                            <td class="flex items-center">
+                                <img src="https://ui-avatars.com/api/?name=${activity.user_name || 'User'}&background=0056B3&color=fff" 
+                                     alt="${activity.user_name || 'User'}" class="w-8 h-8 rounded-full mr-3">
+                                <span>${activity.user_name || 'User'}</span>
+                            </td>
+                            <td>${activity.action}</td>
+                            <td>${activity.details}</td>
+                            <td>${new Date(activity.created_at).toLocaleDateString()}</td>
+                            <td>
+                                <span class="status-badge ${getStatusClass(activity.status)}">
+                                    ${activity.status}
+                                </span>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    activityTable.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-gray-500">No recent activity</td>
+                        </tr>
+                    `;
+                }
+
+                // Initialize charts
+                initializeCharts(users, payments);
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showError('Failed to load dashboard data');
+            }
+        }
+
+        // Helper function for status badges
+        function getStatusClass(status) {
+            switch (status?.toLowerCase()) {
+                case 'success':
+                    return 'success';
+                case 'pending':
+                    return 'warning';
+                case 'failed':
+                    return 'danger';
+                default:
+                    return 'info';
+            }
+        }
+
+        // Initialize charts
+        function initializeCharts(users, payments) {
+            // User Growth Chart
+            const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+            const userGrowthData = processUserGrowthData(users);
+            
+            new Chart(userGrowthCtx, {
+                type: 'line',
+                data: {
+                    labels: userGrowthData.labels,
+                    datasets: [{
+                        label: 'Users',
+                        data: userGrowthData.data,
+                        borderColor: '#0056B3',
+                        backgroundColor: 'rgba(0, 86, 179, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            const revenueData = processRevenueData(payments);
+            
+            new Chart(revenueCtx, {
+                type: 'bar',
+                data: {
+                    labels: revenueData.labels,
+                    datasets: [{
+                        label: 'Revenue',
+                        data: revenueData.data,
+                        backgroundColor: '#0056B3',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Process user growth data for chart
+        function processUserGrowthData(users) {
+            // For demo purposes, generate sample data
+            const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const data = [65, 72, 78, 81, 85, 90, 95];
+            
+            return { labels, data };
+        }
+
+        // Process revenue data for chart
+        function processRevenueData(payments) {
+            // For demo purposes, generate sample data
+            const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const data = [120, 190, 150, 210, 180, 250, 220];
+            
+            return { labels, data };
+        }
+
+        // Show error message
+        function showError(message) {
+            console.error(message);
+            // Implement error notification
+        }
+
+        // Mobile menu functionality
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('mobile-menu-content').classList.remove('-translate-x-full');
+            }, 10);
+        });
+
+        document.getElementById('close-mobile-menu').addEventListener('click', function() {
+            document.getElementById('mobile-menu-content').classList.add('-translate-x-full');
+            setTimeout(() => {
+                document.getElementById('mobile-menu').classList.add('hidden');
+            }, 300);
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Clear any stored redirect path to prevent redirection loops
+            sessionStorage.removeItem('redirectAfterLogin');
+            
+            // Test Supabase connection
+            testSupabaseConnection();
+            
+            // Check jobs table schema
+            checkJobsTableSchema();
+            
+            checkAdmin();
+            // Load recent jobs
+            loadRecentJobs();
+        });
+
+        // Test Supabase connection
+        async function testSupabaseConnection() {
+            try {
+                console.log('Testing Supabase connection...');
+                
+                // Check if Supabase client is initialized
+                if (!supabase) {
+                    console.error('Supabase client is not initialized');
+                    return;
+                }
+                
+                // Try to fetch a count from the jobs table
+                const { data, error } = await supabase
+                    .from('jobs')
+                    .select('count');
+                
+                if (error) {
+                    console.error('Error testing Supabase connection:', error);
+                    alert('Error connecting to database: ' + error.message);
+                } else {
+                    console.log('Supabase connection successful, jobs count:', data);
+                }
+            } catch (error) {
+                console.error('Error testing Supabase connection:', error);
+                alert('Error connecting to database: ' + error.message);
+            }
+        }
+
+        // Load recent jobs
+        async function loadRecentJobs() {
+            try {
+                console.log('Loading recent jobs...');
+                
+                // Check if Supabase client is initialized
+                if (!supabase) {
+                    console.error('Supabase client is not initialized');
+                    return;
+                }
+                
+                // Log the Supabase configuration
+                console.log('Supabase URL:', supabaseUrl);
+                console.log('Supabase client:', supabase);
+                
+                // Check if the jobs table exists
+                const { data: tableInfo, error: tableError } = await supabase
+                    .from('jobs')
+                    .select('count');
+                
+                if (tableError) {
+                    console.error('Error checking jobs table:', tableError);
+                } else {
+                    console.log('Jobs table exists, count:', tableInfo);
+                }
+                
+                // Fetch the jobs
+                const { data: jobs, error } = await supabase
+                    .from('jobs')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                if (error) {
+                    console.error('Error fetching jobs:', error);
+                    throw error;
+                }
+
+                console.log('Jobs fetched:', jobs);
+
+                const recentJobsTable = document.getElementById('recent-jobs');
+                if (!recentJobsTable) {
+                    console.error('Recent jobs table element not found');
+                    return;
+                }
+
+                if (!jobs || jobs.length === 0) {
+                    console.log('No jobs found, displaying empty message');
+                    recentJobsTable.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                No jobs found
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                console.log('Rendering jobs table with', jobs.length, 'jobs');
+                recentJobsTable.innerHTML = jobs.map(job => `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${job.owner_name || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${job.owner_name || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${job.location || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${job.type || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${job.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${job.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${job.created_at ? new Date(job.created_at).toLocaleDateString() : 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="window.location.href='manage-jobs.html?id=${job.id}'" class="text-brand-primary hover:text-brand-secondary mr-2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="window.location.href='../jobs/post-job.html?id=${job.id}'" class="text-brand-primary hover:text-brand-secondary">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                console.log('Recent jobs table updated');
+            } catch (error) {
+                console.error('Error loading recent jobs:', error);
+                const recentJobsTable = document.getElementById('recent-jobs');
+                if (recentJobsTable) {
+                    recentJobsTable.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-red-500">
+                                Error loading jobs: ${error.message}
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+        }
+
+        // Check jobs table schema
+        async function checkJobsTableSchema() {
+            try {
+                console.log('Checking jobs table schema...');
+                
+                // Check if Supabase client is initialized
+                if (!supabase) {
+                    console.error('Supabase client is not initialized');
+                    return;
+                }
+                
+                // Try to fetch a single job to check the schema
+                const { data, error } = await supabase
+                    .from('jobs')
+                    .select('*')
+                    .limit(1);
+                
+                if (error) {
+                    console.error('Error checking jobs table schema:', error);
+                } else if (data && data.length > 0) {
+                    console.log('Jobs table schema:', Object.keys(data[0]));
+                    
+                    // Check for required fields
+                    const requiredFields = ['id', 'owner_name', 'location', 'type', 'is_active', 'created_at'];
+                    const missingFields = requiredFields.filter(field => !(field in data[0]));
+                    
+                    if (missingFields.length > 0) {
+                        console.warn('Missing required fields in jobs table:', missingFields);
+                    } else {
+                        console.log('All required fields present in jobs table');
+                    }
+                } else {
+                    console.log('No jobs found in the table');
+                }
+            } catch (error) {
+                console.error('Error checking jobs table schema:', error);
+            }
+        }
+    </script>
+</body>
+</html> 

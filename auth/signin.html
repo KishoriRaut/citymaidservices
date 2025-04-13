@@ -146,31 +146,28 @@
         // Initialize Supabase client
         const supabaseUrl = 'https://fdgqqxyyofjnkhswkwcq.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZ3FxeHl5b2Zqbmtoc3drd2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMjQyMTMsImV4cCI6MjA1OTYwMDIxM30.YyJLLu3r2a7Mh7ny0ie-YzzLfPh5PdrJJHnBFBxWqVE';
-        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const redirectUrl = urlParams.get('redirect') || '../index.html';
         const jobId = urlParams.get('jobId');
+        const redirectUrl = urlParams.get('redirect') || '../index.html';
 
-        // Handle form submission
-        document.getElementById('signInForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // Handle sign in
+        async function handleSignIn(event) {
+            event.preventDefault();
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const remember = document.getElementById('remember').checked;
-            
             const button = document.getElementById('signInButton');
             const errorMessage = document.getElementById('errorMessage');
-            const successMessage = document.getElementById('successMessage');
             
             try {
                 // Show loading state
                 button.disabled = true;
                 button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Signing in...';
                 errorMessage.classList.add('hidden');
-                
+
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password
@@ -178,26 +175,98 @@
 
                 if (error) throw error;
 
-                // Show success message
-                successMessage.classList.remove('hidden');
-                
-                // Handle redirection
-                if (jobId) {
-                    // If there's a jobId, redirect to payment page
-                    window.location.href = `payment.html?jobId=${jobId}`;
-                } else {
-                    // Otherwise redirect to the specified redirect URL or index
-                    window.location.href = redirectUrl;
+                console.log('Sign in successful:', data); // Debug log
+
+                // Get user profile to check role
+                const { data: profile, error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .select('role, full_name')
+                    .eq('id', data.user.id)
+                    .single();
+
+                if (profileError) {
+                    console.error('Profile error:', profileError); // Debug log
+                    throw profileError;
                 }
 
+                console.log('User profile:', profile); // Debug log
+
+                // Check for stored redirect path
+                const redirectPath = sessionStorage.getItem('redirectAfterLogin');
+                console.log('Redirect path:', redirectPath); // Debug log
+
+                if (redirectPath) {
+                    sessionStorage.removeItem('redirectAfterLogin');
+                    window.location.href = redirectPath;
+                    return;
+                }
+
+                // If no stored path, redirect based on role
+                if (profile?.role === 'admin') {
+                    window.location.href = '../dashboard/admin-dashboard.html';
+                } else if (profile?.role === 'employer') {
+                    window.location.href = '../dashboard/employer-dashboard.html';
+                } else if (profile?.role === 'maid') {
+                    window.location.href = '../dashboard/maid-dashboard.html';
+                } else {
+                    window.location.href = '../index.html';
+                }
             } catch (error) {
-                console.error('Sign in error:', error);
+                console.error('Sign in error:', error); // Debug log
                 errorMessage.textContent = error.message;
                 errorMessage.classList.remove('hidden');
                 button.disabled = false;
                 button.innerHTML = 'Sign in';
             }
-        });
+        }
+
+        // Check if user is already signed in
+        async function checkAuth() {
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                console.log('Current session:', session); // Debug log
+
+                if (session) {
+                    // Get user profile to check role
+                    const { data: profile, error: profileError } = await supabaseClient
+                        .from('profiles')
+                        .select('role, full_name')
+                        .eq('id', session.user.id)
+                        .single();
+
+                    if (profileError) {
+                        console.error('Profile error:', profileError); // Debug log
+                        throw profileError;
+                    }
+
+                    console.log('User profile:', profile); // Debug log
+
+                    // Check for stored redirect path
+                    const redirectPath = sessionStorage.getItem('redirectAfterLogin');
+                    console.log('Redirect path:', redirectPath); // Debug log
+
+                    if (redirectPath) {
+                        sessionStorage.removeItem('redirectAfterLogin');
+                        window.location.href = redirectPath;
+                        return;
+                    }
+
+                    // If no stored path, redirect based on role
+                    if (profile?.role === 'admin') {
+                        window.location.href = '../dashboard/admin-dashboard.html';
+                    } else if (profile?.role === 'employer') {
+                        window.location.href = '../dashboard/employer-dashboard.html';
+                    } else if (profile?.role === 'maid') {
+                        window.location.href = '../dashboard/maid-dashboard.html';
+                    } else {
+                        window.location.href = '../index.html';
+                    }
+                }
+            } catch (error) {
+                console.error('Auth check error:', error); // Debug log
+                window.location.href = '../index.html';
+            }
+        }
 
         // Sign in with Google
         async function signInWithGoogle() {
@@ -241,20 +310,11 @@
             }
         }
 
-        // Check if user is already signed in
-        async function checkAuth() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
-                if (jobId) {
-                    window.location.href = `payment.html?jobId=${jobId}`;
-                } else {
-                    window.location.href = redirectUrl;
-                }
-            }
-        }
-
         // Check auth on page load
         checkAuth();
+
+        // Add form submission event listener
+        document.getElementById('signInForm').addEventListener('submit', handleSignIn);
     </script>
 </body>
 </html>

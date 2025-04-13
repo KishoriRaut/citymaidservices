@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users - City Maid</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Supabase Configuration -->
+    <script src="supabase-config.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-primary': '#0056B3',
+                        'brand-secondary': '#003D82',
+                        'brand-light': '#E6F0FF'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .stat-icon {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1);
+        }
+        .table-row {
+            transition: all 0.2s ease;
+        }
+        .table-row:hover {
+            background-color: #F9FAFB;
+        }
+        .action-button {
+            transition: all 0.2s ease;
+        }
+        .action-button:hover {
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Main content -->
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="hidden md:flex md:flex-shrink-0">
+            <div class="flex flex-col w-64">
+                <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r">
+                    <div class="flex flex-col flex-shrink-0 px-4">
+                        <a href="../index.html" class="text-3xl font-bold text-brand-primary tracking-tight">City<span class="text-brand-secondary">Maid</span></a>
+                    </div>
+                    <div class="flex flex-col flex-grow px-4 mt-5">
+                        <nav class="flex-1 space-y-1">
+                            <a href="admin-dashboard.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-chart-line mr-3 text-brand-primary"></i>
+                                Dashboard
+                            </a>
+                            <a href="manage-users.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-brand-light text-brand-primary group">
+                                <i class="fas fa-users mr-3"></i>
+                                Manage Users
+                            </a>
+                            <a href="manage-jobs.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-briefcase mr-3 text-brand-primary"></i>
+                                Manage Jobs
+                            </a>
+                            <a href="manage-maids.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-broom mr-3 text-brand-primary"></i>
+                                Manage Maids
+                            </a>
+                            <a href="manage-payments.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-credit-card mr-3 text-brand-primary"></i>
+                                Manage Payments
+                            </a>
+                            <a href="settings.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-cog mr-3 text-brand-primary"></i>
+                                Settings
+                            </a>
+                        </nav>
+                        <div class="flex flex-shrink-0 p-4 mt-auto">
+                            <a href="../auth/signin.html" class="flex items-center w-full">
+                                <i class="fas fa-sign-out-alt mr-3 text-brand-primary"></i>
+                                <span class="text-sm font-medium">Sign Out</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main content area -->
+        <div class="flex flex-col flex-1 overflow-hidden">
+            <!-- Top bar -->
+            <header class="flex-shrink-0 relative h-16 bg-white flex items-center shadow-sm">
+                <!-- Mobile menu button -->
+                <button type="button" class="px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-primary md:hidden" id="mobile-menu-button">
+                    <span class="sr-only">Open sidebar</span>
+                    <i class="fas fa-bars h-6 w-6"></i>
+                </button>
+
+                <!-- Search -->
+                <div class="flex-1 px-4 flex justify-between">
+                    <div class="flex-1 flex">
+                        <div class="w-full flex md:ml-0">
+                            <label for="search-input" class="sr-only">Search</label>
+                            <div class="relative w-full text-gray-400 focus-within:text-gray-600">
+                                <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none">
+                                    <i class="fas fa-search h-5 w-5"></i>
+                                </div>
+                                <input id="search-input" class="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-transparent sm:text-sm" placeholder="Search users..." type="search">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main content -->
+            <main class="flex-1 relative overflow-y-auto focus:outline-none">
+                <div class="py-6">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h1 class="text-2xl font-bold text-gray-900">Manage Users</h1>
+                            <div class="flex space-x-3">
+                                <button id="add-user" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-primary hover:bg-brand-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary transition-colors duration-200">
+                                    <i class="fas fa-plus mr-2"></i>
+                                    Add User
+                                </button>
+                                <button id="export-csv" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary transition-colors duration-200">
+                                    <i class="fas fa-download mr-2"></i>
+                                    Export CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Statistics Cards -->
+                        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+                            <!-- Total Users Card -->
+                            <div class="bg-white overflow-hidden shadow-card rounded-lg stat-card">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 bg-brand-light rounded-md p-3 stat-icon">
+                                            <i class="fas fa-users text-brand-primary text-xl"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Total Users</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-bold text-gray-900" id="total-users">0</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 px-5 py-3">
+                                    <div class="text-sm">
+                                        <a href="#" class="text-sm font-medium text-brand-primary hover:text-brand-secondary transition-colors duration-200">View all users <i class="fas fa-arrow-right ml-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Total Employers Card -->
+                            <div class="bg-white overflow-hidden shadow-card rounded-lg stat-card">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 bg-brand-light rounded-md p-3 stat-icon">
+                                            <i class="fas fa-user-tie text-brand-primary text-xl"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Total Employers</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-bold text-gray-900" id="total-employers">0</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 px-5 py-3">
+                                    <div class="text-sm">
+                                        <a href="#" class="text-sm font-medium text-brand-primary hover:text-brand-secondary transition-colors duration-200">View all employers <i class="fas fa-arrow-right ml-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Total Maids Card -->
+                            <div class="bg-white overflow-hidden shadow-card rounded-lg stat-card">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 bg-brand-light rounded-md p-3 stat-icon">
+                                            <i class="fas fa-broom text-brand-primary text-xl"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Total Maids</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-bold text-gray-900" id="total-maids">0</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 px-5 py-3">
+                                    <div class="text-sm">
+                                        <a href="#" class="text-sm font-medium text-brand-primary hover:text-brand-secondary transition-colors duration-200">View all maids <i class="fas fa-arrow-right ml-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="mb-6 flex flex-wrap gap-4 bg-white p-4 rounded-lg shadow-card">
+                            <div class="flex-1 min-w-[200px]">
+                                <label for="search-input" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-search text-gray-400"></i>
+                                    </div>
+                                    <input id="search-input" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm" placeholder="Search by name, email, or phone..." type="search">
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-[200px]">
+                                <label for="role-filter" class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                                <select id="role-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm rounded-md">
+                                    <option value="all">All Roles</option>
+                                    <option value="employer">Employer</option>
+                                    <option value="maid">Maid</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <div class="flex-1 min-w-[200px]">
+                                <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                <select id="status-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm rounded-md">
+                                    <option value="all">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                    <option value="pending">Pending</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Users table -->
+                        <div class="flex flex-col mt-6">
+                            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                                    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="users-table-body" class="bg-white divide-y divide-gray-200">
+                                                <!-- Table rows will be dynamically added here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="flex items-center justify-between mt-6 bg-white p-4 rounded-lg shadow-card">
+                            <div class="flex-1 flex justify-between sm:hidden">
+                                <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">Previous</button>
+                                <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">Next</button>
+                            </div>
+                            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                                <div>
+                                    <p id="pagination-info" class="text-sm text-gray-700">
+                                        Loading users...
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div class="fixed inset-0 z-40 hidden" id="mobile-menu">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-gray-600 bg-opacity-75" id="mobile-menu-overlay"></div>
+
+        <!-- Mobile menu content -->
+        <div id="mobile-menu-content" class="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white">
+            <div class="absolute top-0 right-0 -mr-12 pt-2">
+                <button type="button" id="close-mobile-menu" class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                    <span class="sr-only">Close sidebar</span>
+                    <i class="fas fa-times text-white"></i>
+                </button>
+            </div>
+
+            <div class="flex-shrink-0 flex items-center px-4">
+                <a href="../index.html" class="text-3xl font-bold text-brand-primary tracking-tight">City<span class="text-brand-secondary">Maid</span></a>
+            </div>
+            <div class="mt-5 flex-1 h-0 overflow-y-auto">
+                <nav class="px-2 space-y-1">
+                    <a href="admin-dashboard.html" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-brand-light">
+                        <i class="fas fa-chart-line mr-4 text-brand-primary"></i>
+                        Dashboard
+                    </a>
+                    <a href="manage-users.html" class="group flex items-center px-2 py-2 text-base font-medium rounded-md bg-brand-light text-brand-primary">
+                        <i class="fas fa-users mr-4"></i>
+                        Manage Users
+                    </a>
+                    <a href="manage-jobs.html" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-brand-light">
+                        <i class="fas fa-briefcase mr-4 text-brand-primary"></i>
+                        Manage Jobs
+                    </a>
+                    <a href="manage-maids.html" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-brand-light">
+                        <i class="fas fa-broom mr-4 text-brand-primary"></i>
+                        Manage Maids
+                    </a>
+                    <a href="manage-payments.html" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-brand-light">
+                        <i class="fas fa-credit-card mr-4 text-brand-primary"></i>
+                        Manage Payments
+                    </a>
+                    <a href="settings.html" class="group flex items-center px-2 py-2 text-base font-medium rounded-md hover:bg-brand-light">
+                        <i class="fas fa-cog mr-4 text-brand-primary"></i>
+                        Settings
+                    </a>
+                </nav>
+            </div>
+            <div class="flex-shrink-0 flex border-t border-gray-200 p-4">
+                <a href="../auth/signin.html" class="flex items-center">
+                    <i class="fas fa-sign-out-alt mr-4 text-brand-primary"></i>
+                    <span class="text-base font-medium">Sign Out</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="user-modal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- Modal panel -->
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title"></h3>
+                            <div class="mt-4" id="modal-content">
+                                <!-- Modal content will be dynamically added here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="modal-confirm" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">Delete</button>
+                    <button type="button" id="close-modal" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Direct Data Rendering Script -->
+    <script>
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                console.log('Initializing page...');
+                
+                // Initialize Supabase client
+                const SUPABASE_URL = 'https://fdgqqxyyofjnkhswkwcq.supabase.co';
+                const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZ3FxeHl5b2Zqbmtoc3drd2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMjQyMTMsImV4cCI6MjA1OTYwMDIxM30.YyJLLu3r2a7Mh7ny0ie-YzzLfPh5PdrJJHnBFBxWqVE';
+                
+                console.log('Initializing Supabase client...');
+                console.log('Supabase URL:', SUPABASE_URL);
+                
+                let supabaseClient;
+                try {
+                    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    console.log('Supabase client created successfully');
+                    
+                    // Test the connection
+                    console.log('Testing Supabase connection...');
+                    const { data, error } = await supabaseClient
+                        .from('users')
+                        .select('count')
+                        .limit(1);
+                        
+                    if (error) {
+                        console.error('Supabase connection test failed:', error);
+                        throw new Error(`Connection test failed: ${error.message}`);
+                    }
+                    
+                    console.log('Supabase connection test successful:', data);
+                    window.supabaseClient = supabaseClient;
+                } catch (error) {
+                    console.error('Error initializing Supabase client:', error);
+                    showErrorMessage(`Failed to initialize database connection: ${error.message}`);
+                }
+
+                // Set up event listeners
+                setupEventListeners();
+
+                // Load initial data
+                console.log('Loading initial data...');
+                await fetchUsers().catch(error => {
+                    console.error('Error loading users:', error);
+                    showErrorMessage(`Error loading users: ${error.message}`);
+                });
+
+                console.log('Page initialization complete');
+            } catch (error) {
+                console.error('Error during page initialization:', error);
+                showErrorMessage(`Error initializing page: ${error.message}`);
+            }
+        });
+
+        function setupEventListeners() {
+            // Set up search input with debounce
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                let debounceTimer;
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        fetchUsers().catch(error => {
+                            console.error('Error fetching users after search:', error);
+                            showErrorMessage(`Error searching users: ${error.message}`);
+                        });
+                    }, 300);
+                });
+            }
+
+            // Set up role filter
+            const roleFilter = document.getElementById('role-filter');
+            if (roleFilter) {
+                roleFilter.addEventListener('change', () => {
+                    fetchUsers().catch(error => {
+                        console.error('Error fetching users after role change:', error);
+                        showErrorMessage(`Error filtering users: ${error.message}`);
+                    });
+                });
+            }
+
+            // Set up status filter
+            const statusFilter = document.getElementById('status-filter');
+            if (statusFilter) {
+                statusFilter.addEventListener('change', () => {
+                    fetchUsers().catch(error => {
+                        console.error('Error fetching users after status change:', error);
+                        showErrorMessage(`Error filtering users: ${error.message}`);
+                    });
+                });
+            }
+
+            // Set up add user button
+            const addUserButton = document.getElementById('add-user');
+            if (addUserButton) {
+                addUserButton.addEventListener('click', () => {
+                    showAddUserForm();
+                });
+            }
+
+            // Set up export CSV button
+            const exportCsvButton = document.getElementById('export-csv');
+            if (exportCsvButton) {
+                exportCsvButton.addEventListener('click', () => {
+                    exportUsersToCSV();
+                });
+            }
+        }
+
+        // Function to fetch users from Supabase
+        async function fetchUsers() {
+            const usersTableBody = document.getElementById('users-table-body');
+            const searchInput = document.getElementById('search-input');
+            const roleFilter = document.getElementById('role-filter');
+            const statusFilter = document.getElementById('status-filter');
+            
+            // Show loading state
+            usersTableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                        <i class="fas fa-spinner fa-spin mr-2"></i> Loading users...
+                    </td>
+                </tr>
+            `;
+            
+            try {
+                if (!window.supabaseClient) {
+                    throw new Error('Database connection not initialized');
+                }
+
+                // Build the query
+                let query = window.supabaseClient
+                    .from('users')
+                    .select('*');
+                
+                // Apply role filter
+                const selectedRole = roleFilter.value;
+                if (selectedRole !== 'all') {
+                    query = query.eq('role', selectedRole);
+                }
+
+                // Apply status filter
+                const selectedStatus = statusFilter.value;
+                if (selectedStatus !== 'all') {
+                    query = query.eq('status', selectedStatus);
+                }
+
+                // Execute query
+                const { data: users, error } = await query;
+
+                if (error) throw error;
+
+                if (!users || users.length === 0) {
+                    usersTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                No users found
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                // Apply search filter
+                let filteredUsers = users;
+                const searchTerm = searchInput.value.toLowerCase();
+                if (searchTerm) {
+                    filteredUsers = users.filter(user => 
+                        (user.name || '').toLowerCase().includes(searchTerm) ||
+                        (user.email || '').toLowerCase().includes(searchTerm) ||
+                        (user.mobile || '').toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                // Update table
+                usersTableBody.innerHTML = filteredUsers.map(user => `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <img class="h-10 w-10 rounded-full" 
+                                        src="${user.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name)}" 
+                                        alt="${user.name}">
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">${user.name || 'N/A'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${user.email || 'N/A'}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${user.mobile || 'N/A'}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
+                                user.role === 'employer' ? 'bg-blue-100 text-blue-800' :
+                                'bg-green-100 text-green-800'
+                            }">
+                                ${user.role || 'user'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                user.status === 'active' ? 'bg-green-100 text-green-800' :
+                                user.status === 'inactive' ? 'bg-red-100 text-red-800' :
+                                'bg-yellow-100 text-yellow-800'
+                            }">
+                                ${user.status || 'pending'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${new Date(user.created_at).toLocaleDateString()}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="viewUser('${user.id}')" 
+                                    class="text-brand-primary hover:text-brand-secondary mr-2">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="editUser('${user.id}')"
+                                    class="text-brand-primary hover:text-brand-secondary mr-2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="toggleUserStatus('${user.id}', '${user.status === 'active' ? 'inactive' : 'active'}')"
+                                    class="text-${user.status === 'active' ? 'red' : 'green'}-600 hover:text-${user.status === 'active' ? 'red' : 'green'}-800">
+                                <i class="fas fa-${user.status === 'active' ? 'ban' : 'check-circle'}"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Update statistics
+                updateUserStatistics(users);
+
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                usersTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-4 text-center text-red-500">
+                            Error loading users: ${error.message}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function updateUserStatistics(users) {
+            const totalUsers = document.getElementById('total-users');
+            const totalEmployers = document.getElementById('total-employers');
+            const totalMaids = document.getElementById('total-maids');
+
+            if (users) {
+                totalUsers.textContent = users.length;
+                totalEmployers.textContent = users.filter(u => u.role === 'employer').length;
+                totalMaids.textContent = users.filter(u => u.role === 'maid').length;
+            }
+        }
+
+        // Function to show error message
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded';
+            errorDiv.role = 'alert';
+            errorDiv.innerHTML = `
+                <strong class="font-bold">Error!</strong>
+                <span class="block sm:inline">${message}</span>
+            `;
+            document.body.appendChild(errorDiv);
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        // Function to view user
+        async function viewUser(userId) {
+            try {
+                // Fetch user details
+                const { data: user, error } = await window.supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (error) throw error;
+                if (!user) throw new Error('User not found');
+
+                // Create modal content
+                const modalContent = `
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-brand-light sm:mx-0 sm:h-16 sm:w-16">
+                                <img class="h-12 w-12 rounded-full sm:h-16 sm:w-16" 
+                                    src="${user.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name)}" 
+                                    alt="${user.name}">
+                            </div>
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 flex items-center justify-between">
+                                    ${user.name || 'N/A'}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                        user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
+                                        user.role === 'employer' ? 'bg-blue-100 text-blue-800' :
+                                        'bg-green-100 text-green-800'
+                                    }">
+                                        ${user.role || 'user'}
+                                    </span>
+                                </h3>
+                                <div class="mt-4 space-y-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-500">Email</label>
+                                        <p class="mt-1 text-sm text-gray-900">${user.email || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-500">Phone</label>
+                                        <p class="mt-1 text-sm text-gray-900">${user.mobile || 'Not provided'}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-500">Status</label>
+                                        <span class="mt-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                            user.status === 'active' ? 'bg-green-100 text-green-800' :
+                                            user.status === 'inactive' ? 'bg-red-100 text-red-800' :
+                                            'bg-yellow-100 text-yellow-800'
+                                        }">
+                                            ${user.status || 'pending'}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-500">Joined</label>
+                                        <p class="mt-1 text-sm text-gray-900">${new Date(user.created_at).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="button" onclick="closeModal()"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Close
+                        </button>
+                    </div>
+                `;
+
+                // Show modal
+                showModal(modalContent);
+
+            } catch (error) {
+                console.error('Error viewing user:', error);
+                showErrorMessage(`Error viewing user: ${error.message}`);
+            }
+        }
+
+        // Function to show add user form
+        function showAddUserForm() {
+            const modal = document.getElementById('user-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            const modalConfirm = document.getElementById('modal-confirm');
+            const closeModal = document.getElementById('close-modal');
+
+            if (modal && modalTitle && modalContent && modalConfirm && closeModal) {
+                modalTitle.textContent = 'Add New User';
+                modalContent.innerHTML = `
+                    <form id="add-user-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Name</label>
+                            <input type="text" name="name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" name="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Mobile</label>
+                            <input type="tel" name="mobile" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Role</label>
+                            <select name="role" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm">
+                                <option value="employer">Employer</option>
+                                <option value="maid">Maid</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Status</label>
+                            <select name="status" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+                    </form>
+                `;
+
+                modalConfirm.textContent = 'Add User';
+                modalConfirm.classList.remove('bg-red-600', 'hover:bg-red-700');
+                modalConfirm.classList.add('bg-brand-primary', 'hover:bg-brand-secondary');
+                closeModal.textContent = 'Cancel';
+
+                modal.classList.remove('hidden');
+
+                // Handle form submission
+                modalConfirm.onclick = async () => {
+                    const form = document.getElementById('add-user-form');
+                    if (form) {
+                        const formData = new FormData(form);
+                        try {
+                            // Create user in auth
+                            const { data: authUser, error: authError } = await window.supabaseClient.auth.admin.createUser({
+                                email: formData.get('email'),
+                                password: 'temporary-password', // User will reset this
+                                email_confirm: true
+                            });
+
+                            if (authError) throw authError;
+
+                            // Create user profile
+                            const { error: userError } = await window.supabaseClient.from('users').insert({
+                                id: authUser.id,
+                                name: formData.get('name'),
+                                email: formData.get('email'),
+                                mobile: formData.get('mobile'),
+                                role: formData.get('role'),
+                                status: formData.get('status')
+                            });
+
+                            if (userError) throw userError;
+
+                            modal.classList.add('hidden');
+                            showSuccessMessage('User added successfully');
+                            fetchUsers(); // Refresh the users list
+                        } catch (error) {
+                            console.error('Error adding user:', error);
+                            showErrorMessage('Error adding user. Please try again.');
+                        }
+                    }
+                };
+
+                closeModal.onclick = () => {
+                    modal.classList.add('hidden');
+                };
+            }
+        }
+
+        // Function to edit user
+        async function editUser(userId) {
+            try {
+                // Fetch user details
+                const { data: user, error } = await window.supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (error) throw error;
+                if (!user) throw new Error('User not found');
+
+                // Create modal content
+                const modalContent = `
+                    <form id="edit-user-form" onsubmit="handleEditUserSubmit(event, '${userId}')">
+                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            <div class="sm:flex sm:items-start">
+                                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-brand-light sm:mx-0 sm:h-16 sm:w-16">
+                                    <img class="h-12 w-12 rounded-full sm:h-16 sm:w-16" 
+                                        src="${user.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name)}" 
+                                        alt="${user.name}">
+                                </div>
+                                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                        Edit User
+                                    </h3>
+                                    <div class="mt-4 space-y-3">
+                                        <div>
+                                            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                                            <input type="text" name="name" id="name" required
+                                                value="${user.name || ''}"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm">
+                                        </div>
+                                        <div>
+                                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                                            <input type="email" name="email" id="email" required
+                                                value="${user.email || ''}"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm">
+                                        </div>
+                                        <div>
+                                            <label for="mobile" class="block text-sm font-medium text-gray-700">Phone</label>
+                                            <input type="tel" name="mobile" id="mobile"
+                                                value="${user.mobile || ''}"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm">
+                                        </div>
+                                        <div>
+                                            <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                                            <select name="role" id="role" required
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm">
+                                                <option value="employer" ${user.role === 'employer' ? 'selected' : ''}>Employer</option>
+                                                <option value="maid" ${user.role === 'maid' ? 'selected' : ''}>Maid</option>
+                                                <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                                            <select name="status" id="status" required
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-primary focus:border-brand-primary sm:text-sm">
+                                                <option value="active" ${user.status === 'active' ? 'selected' : ''}>Active</option>
+                                                <option value="inactive" ${user.status === 'inactive' ? 'selected' : ''}>Inactive</option>
+                                                <option value="pending" ${user.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <button type="submit"
+                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-brand-primary text-base font-medium text-white hover:bg-brand-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary sm:ml-3 sm:w-auto sm:text-sm">
+                                Save Changes
+                            </button>
+                            <button type="button" onclick="closeModal()"
+                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                `;
+
+                // Show modal
+                showModal(modalContent);
+
+            } catch (error) {
+                console.error('Error editing user:', error);
+                showErrorMessage(`Error editing user: ${error.message}`);
+            }
+        }
+
+        async function handleEditUserSubmit(event, userId) {
+            event.preventDefault();
+            
+            try {
+                const formData = new FormData(event.target);
+                const updates = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    mobile: formData.get('mobile'),
+                    role: formData.get('role'),
+                    status: formData.get('status'),
+                    updated_at: new Date().toISOString()
+                };
+
+                const { error } = await window.supabaseClient
+                    .from('users')
+                    .update(updates)
+                    .eq('id', userId);
+
+                if (error) throw error;
+
+                // Close modal and refresh users list
+                closeModal();
+                await fetchUsers();
+                showSuccessMessage('User updated successfully');
+
+            } catch (error) {
+                console.error('Error updating user:', error);
+                showErrorMessage(`Error updating user: ${error.message}`);
+            }
+        }
+
+        // Function to show success message
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded';
+            successDiv.role = 'alert';
+            successDiv.innerHTML = `
+                <strong class="font-bold">Success!</strong>
+                <span class="block sm:inline">${message}</span>
+            `;
+            document.body.appendChild(successDiv);
+            setTimeout(() => {
+                successDiv.remove();
+            }, 5000);
+        }
+
+        // Function to show modal
+        function showModal(content) {
+            const modal = document.getElementById('user-modal');
+            const modalContent = document.getElementById('modal-content');
+            
+            if (modal && modalContent) {
+                modalContent.innerHTML = content;
+                modal.classList.remove('hidden');
+            }
+        }
+
+        // Function to close modal
+        function closeModal() {
+            const modal = document.getElementById('user-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Function to toggle user status
+        async function toggleUserStatus(userId, newStatus) {
+            console.log('Toggling user status:', userId, newStatus);
+            try {
+                // Get current user status
+                const { data: user, error: fetchError } = await window.supabaseClient
+                    .from('users')
+                    .select('status')
+                    .eq('id', userId)
+                    .single();
+
+                if (fetchError) throw fetchError;
+
+                // Toggle status
+                const { error: updateError } = await window.supabaseClient
+                    .from('users')
+                    .update({ status: newStatus })
+                    .eq('id', userId);
+
+                if (updateError) throw updateError;
+
+                showSuccessMessage(`User ${newStatus === 'active' ? 'activated' : 'deactivated'} successfully`);
+                fetchUsers(); // Refresh the users list
+            } catch (error) {
+                console.error('Error toggling user status:', error);
+                showErrorMessage('Error updating user status. Please try again.');
+            }
+        }
+        
+        // Function to export users to CSV
+        async function exportUsersToCSV() {
+            console.log('Exporting users to CSV...');
+            
+            try {
+                // Get the current role filter value
+                const roleFilter = document.getElementById('role-filter');
+                const roleValue = roleFilter ? roleFilter.value : 'all';
+                
+                // If we're viewing employers, we need to export employer data
+                if (roleValue === 'employer') {
+                    await exportEmployersToCSV();
+                    return;
+                }
+
+                let users;
+                
+                // Try to fetch from Supabase first
+                try {
+                    const { data, error } = await window.supabaseClient
+                        .from('users')
+                        .select('id, name, email, mobile, role, status, created_at');
+                    
+                    if (error) throw error;
+                    users = data;
+                } catch (error) {
+                    console.warn('Error fetching from Supabase, using sample data:', error);
+                    // Use sample data as fallback
+                    users = [
+                        {
+                            id: '1',
+                            name: 'John Admin',
+                            email: 'admin@citymaid.com',
+                            mobile: '+1234567890',
+                            role: 'admin',
+                            status: 'active',
+                            created_at: '2024-01-01'
+                        },
+                        {
+                            id: '2',
+                            name: 'Mary Employer',
+                            email: 'mary@example.com',
+                            mobile: '+1234567891',
+                            role: 'employer',
+                            status: 'active',
+                            created_at: '2024-01-02'
+                        },
+                        {
+                            id: '3',
+                            name: 'Sarah Maid',
+                            email: 'sarah@example.com',
+                            mobile: '+1234567892',
+                            role: 'maid',
+                            status: 'active',
+                            created_at: '2024-01-03'
+                        }
+                    ];
+                }
+
+                if (!users || users.length === 0) {
+                    alert('No users to export');
+                    return;
+                }
+
+                // Create CSV header
+                let csvContent = 'Name,Email,Phone,Role,Status,Joined\n';
+
+                // Add data rows
+                users.forEach(user => {
+                    const fields = [
+                        user.name,
+                        user.email,
+                        user.mobile || 'N/A',
+                        user.role,
+                        user.status,
+                        new Date(user.created_at).toLocaleDateString()
+                    ];
+
+                    // Escape commas and quotes in the data
+                    const escapedFields = fields.map(field => {
+                        const stringField = String(field);
+                        return stringField.includes(',') ? `"${stringField}"` : stringField;
+                    });
+
+                    csvContent += escapedFields.join(',') + '\n';
+                });
+
+                // Create a blob and download link
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `users_export_${new Date().toISOString().slice(0, 10)}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showSuccessMessage('Users exported to CSV successfully');
+
+            } catch (error) {
+                console.error('Error exporting users to CSV:', error);
+                showErrorMessage('Error exporting users to CSV. Please try again.');
+            }
+        }
+
+        // Function to export employers to CSV
+        async function exportEmployersToCSV() {
+            console.log('Exporting employers to CSV...');
+            
+            try {
+                let employers;
+                
+                // Try to fetch from Supabase first
+                try {
+                    const { data, error } = await window.supabaseClient
+                        .from('users')
+                        .select('id, name, email, mobile, role, status, created_at')
+                        .eq('role', 'employer');
+                    
+                    if (error) throw error;
+                    employers = data;
+                } catch (error) {
+                    console.warn('Error fetching from Supabase, using sample data:', error);
+                    // Use sample data as fallback
+                    employers = [
+                        {
+                            id: '2',
+                            name: 'Mary Employer',
+                            email: 'mary@example.com',
+                            mobile: '+1234567891',
+                            role: 'employer',
+                            status: 'active',
+                            created_at: '2024-01-02'
+                        },
+                        {
+                            id: '4',
+                            name: 'John Employer',
+                            email: 'john@example.com',
+                            mobile: '+1234567893',
+                            role: 'employer',
+                            status: 'active',
+                            created_at: '2024-01-04'
+                        }
+                    ];
+                }
+
+                if (!employers || employers.length === 0) {
+                    alert('No employers to export');
+                    return;
+                }
+
+                // Create CSV header
+                let csvContent = 'Employer Name,Email,Phone,Status,Joined\n';
+
+                // Add data rows
+                employers.forEach(employer => {
+                    const fields = [
+                        employer.name,
+                        employer.email,
+                        employer.mobile || 'N/A',
+                        employer.status,
+                        new Date(employer.created_at).toLocaleDateString()
+                    ];
+
+                    // Escape commas and quotes in the data
+                    const escapedFields = fields.map(field => {
+                        const stringField = String(field);
+                        return stringField.includes(',') ? `"${stringField}"` : stringField;
+                    });
+
+                    csvContent += escapedFields.join(',') + '\n';
+                });
+
+                // Create a blob and download link
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `employers_export_${new Date().toISOString().slice(0, 10)}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showSuccessMessage('Employers exported to CSV successfully');
+
+            } catch (error) {
+                console.error('Error exporting employers to CSV:', error);
+                showErrorMessage('Error exporting employers to CSV. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html> 

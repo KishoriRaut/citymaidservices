@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Maids - City Maid</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Supabase Configuration -->
+    <script src="supabase-config.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-primary': '#0056B3',
+                        'brand-secondary': '#003D82',
+                        'brand-light': '#E6F0FF'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="hidden md:flex md:flex-shrink-0">
+            <div class="flex flex-col w-64">
+                <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r">
+                    <div class="flex flex-col flex-shrink-0 px-4">
+                        <a href="../index.html" class="text-3xl font-bold text-brand-primary tracking-tight">City<span class="text-brand-secondary">Maid</span></a>
+                    </div>
+                    <div class="flex flex-col flex-grow px-4 mt-5">
+                        <nav class="flex-1 space-y-1">
+                            <a href="admin-dashboard.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-chart-line mr-3 text-brand-primary"></i>
+                                Dashboard
+                            </a>
+                            <a href="manage-users.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-users mr-3 text-brand-primary"></i>
+                                Manage Users
+                            </a>
+                            <a href="manage-jobs.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-briefcase mr-3 text-brand-primary"></i>
+                                Manage Jobs
+                            </a>
+                            <a href="manage-maids.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-brand-light text-brand-primary group">
+                                <i class="fas fa-broom mr-3"></i>
+                                Manage Maids
+                            </a>
+                            <a href="manage-payments.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-credit-card mr-3 text-brand-primary"></i>
+                                Manage Payments
+                            </a>
+                            <a href="settings.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-cog mr-3 text-brand-primary"></i>
+                                Settings
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main content area -->
+        <div class="flex flex-col flex-1 overflow-hidden">
+            <!-- Top bar -->
+            <header class="flex-shrink-0 relative h-16 bg-white flex items-center shadow-sm">
+                <button type="button" class="px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-primary md:hidden" id="mobile-menu-button">
+                    <span class="sr-only">Open sidebar</span>
+                    <i class="fas fa-bars h-6 w-6"></i>
+                </button>
+
+                <div class="flex-1 px-4 flex justify-between">
+                    <div class="flex-1 flex">
+                        <h1 class="text-2xl font-semibold text-gray-900">Manage Maids</h1>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main content -->
+            <main class="flex-1 relative overflow-y-auto focus:outline-none">
+                <div class="py-6">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        <!-- Statistics Cards -->
+                        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                            <!-- Total Maids -->
+                            <div class="bg-white overflow-hidden shadow rounded-lg">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-users text-3xl text-brand-primary"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Total Maids</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-semibold text-gray-900" id="total-maids">0</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Active Maids -->
+                            <div class="bg-white overflow-hidden shadow rounded-lg">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-check-circle text-3xl text-brand-primary"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Active Maids</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-semibold text-gray-900" id="active-maids">0</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pending Applications -->
+                            <div class="bg-white overflow-hidden shadow rounded-lg">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-clock text-3xl text-brand-primary"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Pending Applications</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-semibold text-gray-900" id="pending-applications">0</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Verified Maids -->
+                            <div class="bg-white overflow-hidden shadow rounded-lg">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-shield-alt text-3xl text-brand-primary"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Verified Maids</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-semibold text-gray-900" id="verified-maids">0</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="mt-8 bg-white shadow rounded-lg">
+                            <div class="px-4 py-5 sm:p-6">
+                                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                    <div>
+                                        <label for="status-filter" class="block text-sm font-medium text-gray-700">Status</label>
+                                        <select id="status-filter" name="status-filter" 
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm">
+                                            <option value="all">All Statuses</option>
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="suspended">Suspended</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="verification-filter" class="block text-sm font-medium text-gray-700">Verification</label>
+                                        <select id="verification-filter" name="verification-filter" 
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm">
+                                            <option value="all">All</option>
+                                            <option value="verified">Verified</option>
+                                            <option value="unverified">Unverified</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="search-input" class="block text-sm font-medium text-gray-700">Search</label>
+                                        <input type="text" id="search-input" name="search-input" 
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                            placeholder="Search by name, location, or services">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Maids Table -->
+                        <div class="mt-8 bg-white shadow rounded-lg">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Services</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Experience</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Verification</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="maids-table-body" class="bg-white divide-y divide-gray-200">
+                                        <!-- Maids will be dynamically inserted here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Export Button -->
+                        <div class="mt-4 flex justify-end">
+                            <button type="button" onclick="exportMaidsToCSV()" 
+                                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-primary hover:bg-brand-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary">
+                                <i class="fas fa-file-export mr-2"></i>
+                                Export CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Maid Details Modal -->
+    <div id="maid-modal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                Maid Details
+                            </h3>
+                            <div class="mt-4 space-y-4" id="maid-details">
+                                <!-- Maid details will be dynamically inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        onclick="closeMaidModal()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Maids page loaded');
+            
+            // Initialize Supabase client
+            if (!window.supabaseClient) {
+                try {
+                    console.log('Initializing Supabase client...');
+                    window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    console.log('Supabase client initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing Supabase client:', error);
+                    showErrorMessage('Failed to initialize database connection');
+                    return;
+                }
+            }
+
+            // Set up event listeners
+            const searchInput = document.getElementById('search-input');
+            const statusFilter = document.getElementById('status-filter');
+            const verificationFilter = document.getElementById('verification-filter');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(fetchMaids, 300));
+                console.log('Search input event listener added');
+            }
+            
+            if (statusFilter) {
+                statusFilter.addEventListener('change', fetchMaids);
+                console.log('Status filter event listener added');
+            }
+            
+            if (verificationFilter) {
+                verificationFilter.addEventListener('change', fetchMaids);
+                console.log('Verification filter event listener added');
+            }
+
+            // Initial fetch
+            console.log('Fetching maids initially...');
+            await fetchMaids();
+        });
+
+        // Debounce function for search input
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Function to fetch maids from Supabase
+        async function fetchMaids() {
+            try {
+                console.log('Fetching maids...');
+                const maidsTableBody = document.getElementById('maids-table-body');
+                const statusFilter = document.getElementById('status-filter');
+                const verificationFilter = document.getElementById('verification-filter');
+                const searchInput = document.getElementById('search-input');
+
+                if (!maidsTableBody || !statusFilter || !verificationFilter || !searchInput) {
+                    console.error('Required elements not found');
+                    return;
+                }
+
+                // Show loading state
+                maidsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                            <i class="fas fa-spinner fa-spin mr-2"></i> Loading maids...
+                        </td>
+                    </tr>
+                `;
+
+                // Get filter values
+                const status = statusFilter.value;
+                const verification = verificationFilter.value;
+                const searchTerm = searchInput.value.toLowerCase();
+
+                // Build query
+                let query = supabaseClient
+                    .from('maids')
+                    .select(`
+                        id,
+                        full_name,
+                        location,
+                        services,
+                        experience,
+                        status,
+                        is_verified,
+                        contact_phone,
+                        contact_email,
+                        created_at
+                    `)
+                    .order('created_at', { ascending: false });
+
+                // Apply filters
+                if (status !== 'all') {
+                    query = query.eq('status', status);
+                }
+
+                if (verification !== 'all') {
+                    query = query.eq('is_verified', verification === 'verified');
+                }
+
+                const { data: maids, error } = await query;
+
+                if (error) {
+                    console.error('Error fetching maids:', error);
+                    throw error;
+                }
+
+                console.log('Fetched maids:', maids);
+
+                // Filter maids based on search term
+                const filteredMaids = maids.filter(maid => 
+                    maid.full_name.toLowerCase().includes(searchTerm) ||
+                    maid.location.toLowerCase().includes(searchTerm) ||
+                    maid.services.some(service => service.toLowerCase().includes(searchTerm))
+                );
+
+                // Update statistics
+                updateMaidStatistics(filteredMaids);
+
+                // Update table
+                if (!filteredMaids || filteredMaids.length === 0) {
+                    maidsTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                No maids found
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                maidsTableBody.innerHTML = filteredMaids.map(maid => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${maid.full_name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${maid.location}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            <div class="flex flex-wrap gap-1">
+                                ${maid.services.map(service => `
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        ${service}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${maid.experience} years</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(maid.status)}">
+                                ${maid.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${maid.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                                ${maid.is_verified ? 'Verified' : 'Unverified'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div class="flex space-x-2">
+                                <button onclick="viewMaid('${maid.id}')" class="text-blue-600 hover:text-blue-900">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                ${maid.status === 'pending' ? `
+                                <button onclick="updateMaidStatus('${maid.id}', 'active')" class="text-green-600 hover:text-green-900">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                ` : ''}
+                                ${maid.status === 'active' ? `
+                                <button onclick="updateMaidStatus('${maid.id}', 'suspended')" class="text-yellow-600 hover:text-yellow-900">
+                                    <i class="fas fa-ban"></i>
+                                </button>
+                                ` : ''}
+                                ${maid.status === 'suspended' ? `
+                                <button onclick="updateMaidStatus('${maid.id}', 'active')" class="text-green-600 hover:text-green-900">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                ` : ''}
+                                ${!maid.is_verified ? `
+                                <button onclick="verifyMaid('${maid.id}')" class="text-blue-600 hover:text-blue-900">
+                                    <i class="fas fa-shield-alt"></i>
+                                </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error in fetchMaids:', error);
+                const maidsTableBody = document.getElementById('maids-table-body');
+                if (maidsTableBody) {
+                    maidsTableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Error loading maids</td></tr>';
+                }
+            }
+        }
+
+        // Function to get status color
+        function getStatusColor(status) {
+            switch(status) {
+                case 'active':
+                    return 'bg-green-100 text-green-800';
+                case 'inactive':
+                    return 'bg-gray-100 text-gray-800';
+                case 'pending':
+                    return 'bg-yellow-100 text-yellow-800';
+                case 'suspended':
+                    return 'bg-red-100 text-red-800';
+                default:
+                    return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        // Function to update maid statistics
+        function updateMaidStatistics(maids) {
+            const totalMaids = document.getElementById('total-maids');
+            const activeMaids = document.getElementById('active-maids');
+            const pendingApplications = document.getElementById('pending-applications');
+            const verifiedMaids = document.getElementById('verified-maids');
+
+            if (maids) {
+                // Count total maids
+                totalMaids.textContent = maids.length;
+
+                // Count active maids
+                const active = maids.filter(maid => maid.status === 'active').length;
+                activeMaids.textContent = active;
+
+                // Count pending applications
+                const pending = maids.filter(maid => maid.status === 'pending').length;
+                pendingApplications.textContent = pending;
+
+                // Count verified maids
+                const verified = maids.filter(maid => maid.is_verified).length;
+                verifiedMaids.textContent = verified;
+            }
+        }
+
+        // Function to view maid details
+        async function viewMaid(maidId) {
+            try {
+                console.log('Viewing maid:', maidId);
+                const { data: maid, error } = await supabaseClient
+                    .from('maids')
+                    .select(`
+                        id,
+                        full_name,
+                        location,
+                        services,
+                        experience,
+                        status,
+                        is_verified,
+                        contact_phone,
+                        contact_email,
+                        created_at,
+                        bio,
+                        expected_salary,
+                        availability
+                    `)
+                    .eq('id', maidId)
+                    .single();
+
+                if (error) {
+                    console.error('Error fetching maid details:', error);
+                    throw error;
+                }
+
+                console.log('Maid details fetched:', maid);
+
+                // Show the modal with maid details
+                const modal = document.getElementById('maid-modal');
+                const modalTitle = document.getElementById('modal-title');
+                const maidDetails = document.getElementById('maid-details');
+
+                modalTitle.textContent = 'Maid Details';
+
+                maidDetails.innerHTML = `
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Full Name</h4>
+                            <p class="mt-1 text-sm text-gray-900">${maid.full_name}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Location</h4>
+                            <p class="mt-1 text-sm text-gray-900">${maid.location}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Experience</h4>
+                            <p class="mt-1 text-sm text-gray-900">${maid.experience} years</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Expected Salary</h4>
+                            <p class="mt-1 text-sm text-gray-900">$${maid.expected_salary || 'Not specified'}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Status</h4>
+                            <p class="mt-1 text-sm text-gray-900">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(maid.status)}">
+                                    ${maid.status}
+                                </span>
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Verification</h4>
+                            <p class="mt-1 text-sm text-gray-900">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${maid.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                                    ${maid.is_verified ? 'Verified' : 'Unverified'}
+                                </span>
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Contact Phone</h4>
+                            <p class="mt-1 text-sm text-gray-900">${maid.contact_phone || 'Not provided'}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Contact Email</h4>
+                            <p class="mt-1 text-sm text-gray-900">${maid.contact_email || 'Not provided'}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Availability</h4>
+                            <p class="mt-1 text-sm text-gray-900">${maid.availability || 'Not specified'}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Member Since</h4>
+                            <p class="mt-1 text-sm text-gray-900">${new Date(maid.created_at).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <h4 class="text-sm font-medium text-gray-500">Services</h4>
+                        <div class="mt-1 flex flex-wrap gap-1">
+                            ${maid.services.map(service => `
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    ${service}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ${maid.bio ? `
+                    <div class="mt-4">
+                        <h4 class="text-sm font-medium text-gray-500">Bio</h4>
+                        <p class="mt-1 text-sm text-gray-900">${maid.bio}</p>
+                    </div>
+                    ` : ''}
+                `;
+
+                modal.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error viewing maid:', error);
+                showErrorMessage('Error loading maid details: ' + error.message);
+            }
+        }
+
+        // Function to update maid status
+        async function updateMaidStatus(maidId, newStatus) {
+            try {
+                console.log('Updating maid status:', maidId, 'to', newStatus);
+                const { error } = await supabaseClient
+                    .from('maids')
+                    .update({ status: newStatus })
+                    .eq('id', maidId);
+
+                if (error) {
+                    console.error('Error updating maid status:', error);
+                    throw error;
+                }
+
+                showSuccessMessage(`Maid status updated to ${newStatus}`);
+                await fetchMaids();
+            } catch (error) {
+                console.error('Error updating maid status:', error);
+                showErrorMessage('Error updating maid status: ' + error.message);
+            }
+        }
+
+        // Function to verify maid
+        async function verifyMaid(maidId) {
+            try {
+                console.log('Verifying maid:', maidId);
+                const { error } = await supabaseClient
+                    .from('maids')
+                    .update({ is_verified: true })
+                    .eq('id', maidId);
+
+                if (error) {
+                    console.error('Error verifying maid:', error);
+                    throw error;
+                }
+
+                showSuccessMessage('Maid verified successfully');
+                await fetchMaids();
+            } catch (error) {
+                console.error('Error verifying maid:', error);
+                showErrorMessage('Error verifying maid: ' + error.message);
+            }
+        }
+
+        // Function to close maid modal
+        function closeMaidModal() {
+            const modal = document.getElementById('maid-modal');
+            modal.classList.add('hidden');
+        }
+
+        // Function to export maids to CSV
+        async function exportMaidsToCSV() {
+            try {
+                // Fetch complete maid data from Supabase
+                const { data: maids, error } = await supabaseClient
+                    .from('maids')
+                    .select(`
+                        id,
+                        full_name,
+                        location,
+                        services,
+                        experience,
+                        status,
+                        is_verified,
+                        contact_phone,
+                        contact_email,
+                        created_at,
+                        bio,
+                        expected_salary,
+                        availability
+                    `);
+
+                if (error) throw error;
+
+                // Create CSV headers
+                const headers = [
+                    'ID',
+                    'Full Name',
+                    'Location',
+                    'Services',
+                    'Experience (Years)',
+                    'Status',
+                    'Verified',
+                    'Contact Phone',
+                    'Contact Email',
+                    'Member Since',
+                    'Expected Salary',
+                    'Availability'
+                ];
+
+                // Create CSV rows
+                const rows = maids.map(maid => [
+                    maid.id,
+                    maid.full_name,
+                    maid.location,
+                    maid.services.join(', '),
+                    maid.experience,
+                    maid.status,
+                    maid.is_verified ? 'Yes' : 'No',
+                    maid.contact_phone || 'N/A',
+                    maid.contact_email || 'N/A',
+                    new Date(maid.created_at).toLocaleDateString(),
+                    maid.expected_salary || 'Not specified',
+                    maid.availability || 'Not specified'
+                ]);
+
+                // Combine headers and rows
+                const csvContent = [
+                    headers.join(','),
+                    ...rows.map(row => row.map(cell => {
+                        // Escape quotes and wrap in quotes if contains comma or newline
+                        const cellStr = String(cell || '');
+                        if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+                            return `"${cellStr.replace(/"/g, '""')}"`;
+                        }
+                        return cellStr;
+                    }).join(','))
+                ].join('\n');
+
+                // Create and download the file
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `maids_export_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+                
+                showSuccessMessage('Maids exported to CSV successfully');
+            } catch (error) {
+                console.error('Error exporting maids to CSV:', error);
+                showErrorMessage('Error exporting maids to CSV: ' + error.message);
+            }
+        }
+
+        // Function to show error message
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded';
+            errorDiv.role = 'alert';
+            errorDiv.innerHTML = `
+                <strong class="font-bold">Error!</strong>
+                <span class="block sm:inline">${message}</span>
+            `;
+            document.body.appendChild(errorDiv);
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        // Function to show success message
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded';
+            successDiv.role = 'alert';
+            successDiv.innerHTML = `
+                <strong class="font-bold">Success!</strong>
+                <span class="block sm:inline">${message}</span>
+            `;
+            document.body.appendChild(successDiv);
+            setTimeout(() => {
+                successDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html> 

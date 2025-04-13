@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Jobs - City Maid</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Supabase Configuration -->
+    <script src="supabase-config.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-primary': '#0056B3',
+                        'brand-secondary': '#003D82',
+                        'brand-light': '#E6F0FF'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="hidden md:flex md:flex-shrink-0">
+            <div class="flex flex-col w-64">
+                <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r">
+                    <div class="flex flex-col flex-shrink-0 px-4">
+                        <a href="../index.html" class="text-3xl font-bold text-brand-primary tracking-tight">City<span class="text-brand-secondary">Maid</span></a>
+                    </div>
+                    <div class="flex flex-col flex-grow px-4 mt-5">
+                        <nav class="flex-1 space-y-1">
+                            <a href="admin-dashboard.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-chart-line mr-3 text-brand-primary"></i>
+                                Dashboard
+                            </a>
+                            <a href="manage-users.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-users mr-3 text-brand-primary"></i>
+                                Manage Users
+                            </a>
+                            <a href="manage-jobs.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-brand-light text-brand-primary group">
+                                <i class="fas fa-briefcase mr-3"></i>
+                                Manage Jobs
+                            </a>
+                            <a href="manage-maids.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-broom mr-3 text-brand-primary"></i>
+                                Manage Maids
+                            </a>
+                            <a href="manage-payments.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-credit-card mr-3 text-brand-primary"></i>
+                                Manage Payments
+                            </a>
+                            <a href="settings.html" class="flex items-center px-4 py-2 text-sm font-medium rounded-lg hover:bg-brand-light group">
+                                <i class="fas fa-cog mr-3 text-brand-primary"></i>
+                                Settings
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main content area -->
+        <div class="flex flex-col flex-1 overflow-hidden">
+            <!-- Top bar -->
+            <header class="flex-shrink-0 relative h-16 bg-white flex items-center shadow-sm">
+                <button type="button" class="px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-primary md:hidden" id="mobile-menu-button">
+                    <span class="sr-only">Open sidebar</span>
+                    <i class="fas fa-bars h-6 w-6"></i>
+                </button>
+
+                <!-- Search -->
+                <div class="flex-1 px-4 flex justify-between">
+                    <div class="flex-1 flex">
+                        <div class="w-full flex md:ml-0">
+                            <label for="search-input" class="sr-only">Search</label>
+                            <div class="relative w-full text-gray-400 focus-within:text-gray-600">
+                                <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-3">
+                                    <i class="fas fa-search h-5 w-5"></i>
+                                </div>
+                                <input id="search-input" class="block w-full h-full pl-10 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 focus:border-transparent sm:text-sm" placeholder="Search jobs..." type="search">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main content -->
+            <main class="flex-1 relative overflow-y-auto focus:outline-none">
+                <div class="py-6">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h1 class="text-2xl font-bold text-gray-900">Manage Jobs</h1>
+                            <div class="flex space-x-3">
+                                <a href="../jobs/post-job.html" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">
+                                    <i class="fas fa-plus-circle mr-2"></i>
+                                    Post Job
+                                </a>
+                                <button id="export-csv" onclick="exportJobsToCSV()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary transition-colors duration-200">
+                                    <i class="fas fa-download mr-2"></i>
+                                    Export CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Statistics Cards -->
+                        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+                            <!-- Total Jobs Card -->
+                            <div class="bg-white overflow-hidden shadow rounded-lg stat-card">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 bg-brand-light rounded-md p-3">
+                                            <i class="fas fa-briefcase text-brand-primary text-xl"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Total Jobs</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-bold text-gray-900" id="total-jobs">0</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Active Jobs Card -->
+                            <div class="bg-white overflow-hidden shadow rounded-lg stat-card">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
+                                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Active Jobs</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-bold text-gray-900" id="active-jobs">0</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pending Jobs Card -->
+                            <div class="bg-white overflow-hidden shadow rounded-lg stat-card">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 bg-yellow-100 rounded-md p-3">
+                                            <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-medium text-gray-500 truncate">Pending Jobs</dt>
+                                                <dd class="flex items-baseline">
+                                                    <div class="text-2xl font-bold text-gray-900" id="pending-jobs">0</div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="bg-white shadow rounded-lg mb-6">
+                            <div class="p-4 border-b border-gray-200">
+                                <div class="flex flex-wrap gap-4">
+                                    <div class="flex-1 min-w-[200px]">
+                                        <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                        <select id="status-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-primary focus:border-brand-primary rounded-md">
+                                            <option value="all">All Status</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="active">Active</option>
+                                            <option value="completed">Completed</option>
+                                            <option value="cancelled">Cancelled</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex-1 min-w-[200px]">
+                                        <label for="date-filter" class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                                        <input type="date" id="date-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-primary focus:border-brand-primary rounded-md">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Jobs Table -->
+                        <div class="bg-white shadow rounded-lg overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner Name</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Experience</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Working Hours</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salary</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Services</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Posted Date</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="jobs-table-body" class="bg-white divide-y divide-gray-200">
+                                        <!-- Jobs will be dynamically inserted here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Pagination -->
+                            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                                <div class="flex-1 flex justify-between sm:hidden">
+                                    <button id="prev-page-mobile" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                        Previous
+                                    </button>
+                                    <button id="next-page-mobile" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                        Next
+                                    </button>
+                                </div>
+                                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                                    <div>
+                                        <p class="text-sm text-gray-700">
+                                            Showing <span id="items-start">0</span> to <span id="items-end">0</span> of <span id="items-total">0</span> jobs
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                            <button id="prev-page" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                                <span class="sr-only">Previous</span>
+                                                <i class="fas fa-chevron-left h-5 w-5"></i>
+                                            </button>
+                                            <button id="next-page" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                                <span class="sr-only">Next</span>
+                                                <i class="fas fa-chevron-right h-5 w-5"></i>
+                                            </button>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add/Edit Job Modal -->
+    <div id="job-modal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                Edit Job
+                            </h3>
+                            <p class="mt-1 text-sm text-gray-500">
+                                This form is for creating jobs directly in the admin dashboard. For public job postings, use the "Post Job" button.
+                            </p>
+                            <form id="jobForm" class="mt-4 space-y-4">
+                                <div>
+                                    <label for="title" class="block text-sm font-medium text-gray-700">Job Title</label>
+                                    <input type="text" name="title" id="title" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                        value=""
+                                        placeholder="Enter job title">
+                                </div>
+                                <div>
+                                    <label for="description" class="block text-sm font-medium text-gray-700">Job Description</label>
+                                    <textarea name="description" id="description" rows="3" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                        placeholder="Enter job description"></textarea>
+                                </div>
+                                <div>
+                                    <label for="requirements" class="block text-sm font-medium text-gray-700">Requirements</label>
+                                    <textarea name="requirements" id="requirements" rows="3" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                        placeholder="Enter job requirements"></textarea>
+                                </div>
+                                <div>
+                                    <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
+                                    <input type="text" name="location" id="location" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                        value=""
+                                        placeholder="Enter job location">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="salary_min" class="block text-sm font-medium text-gray-700">Minimum Salary</label>
+                                        <input type="number" name="salary_min" id="salary_min" required
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                            value=""
+                                            placeholder="Enter minimum salary">
+                                    </div>
+                                    <div>
+                                        <label for="salary_max" class="block text-sm font-medium text-gray-700">Maximum Salary</label>
+                                        <input type="number" name="salary_max" id="salary_max" required
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                            value=""
+                                            placeholder="Enter maximum salary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                                    <select name="status" id="status" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm">
+                                        <option value="pending">Pending</option>
+                                        <option value="active">Active</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-brand-primary text-base font-medium text-white hover:bg-brand-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary sm:ml-3 sm:w-auto sm:text-sm"
+                        onclick="saveJob(null)">
+                        Create
+                    </button>
+                    <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        onclick="closeJobModal()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('DOM Content Loaded');
+            
+            // Initialize Supabase client
+            if (!window.supabaseClient) {
+                try {
+                    console.log('Initializing Supabase client...');
+                    window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    console.log('Supabase client initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing Supabase client:', error);
+                    showErrorMessage('Failed to initialize database connection');
+                    return;
+                }
+            }
+
+            // Set up event listeners
+            const searchInput = document.getElementById('search-input');
+            const statusFilter = document.getElementById('status-filter');
+            const dateFilter = document.getElementById('date-filter');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(fetchJobs, 300));
+                console.log('Search input event listener added');
+            }
+            
+            if (statusFilter) {
+                statusFilter.addEventListener('change', fetchJobs);
+                console.log('Status filter event listener added');
+            }
+            
+            if (dateFilter) {
+                dateFilter.addEventListener('change', fetchJobs);
+                console.log('Date filter event listener added');
+            }
+
+            // Initial fetch
+            console.log('Fetching jobs initially...');
+            await fetchJobs();
+        });
+
+        // Debounce function for search input
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Function to fetch jobs from Supabase
+        async function fetchJobs() {
+            try {
+                console.log('Fetching jobs...');
+                const jobsTableBody = document.getElementById('jobs-table-body');
+                const statusFilter = document.getElementById('status-filter');
+                const dateFilter = document.getElementById('date-filter');
+                const searchInput = document.getElementById('search-input');
+
+                if (!jobsTableBody || !statusFilter || !dateFilter || !searchInput) {
+                    console.error('Required elements not found');
+                    return;
+                }
+
+                // Show loading state
+                jobsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="11" class="px-6 py-4 text-center text-gray-500">
+                            <i class="fas fa-spinner fa-spin mr-2"></i> Loading jobs...
+                        </td>
+                    </tr>
+                `;
+
+                // Get filter values
+                const status = statusFilter.value;
+                const date = dateFilter.value;
+                const searchTerm = searchInput.value.toLowerCase();
+
+                // Build query
+                let query = supabaseClient
+                    .from('jobs')
+                    .select(`
+                        id,
+                        owner_name,
+                        location,
+                        type,
+                        required_experience,
+                        working_hours,
+                        salary,
+                        services,
+                        description,
+                        contact_phone,
+                        contact_email,
+                        created_at,
+                        is_active
+                    `)
+                    .order('created_at', { ascending: false });
+
+                // Apply filters
+                if (status !== 'all') {
+                    query = query.eq('is_active', status === 'active');
+                }
+
+                if (date !== 'all') {
+                    const now = new Date();
+                    let startDate = new Date();
+                    
+                    switch(date) {
+                        case 'today':
+                            startDate.setHours(0, 0, 0, 0);
+                            break;
+                        case 'week':
+                            startDate.setDate(now.getDate() - 7);
+                            break;
+                        case 'month':
+                            startDate.setMonth(now.getMonth() - 1);
+                            break;
+                    }
+                    
+                    query = query.gte('created_at', startDate.toISOString());
+                }
+
+                const { data: jobs, error } = await query;
+
+                if (error) {
+                    console.error('Error fetching jobs:', error);
+                    throw error;
+                }
+
+                console.log('Fetched jobs:', jobs);
+
+                // Filter jobs based on search term
+                const filteredJobs = jobs.filter(job => 
+                    job.owner_name.toLowerCase().includes(searchTerm) ||
+                    job.location.toLowerCase().includes(searchTerm) ||
+                    job.description.toLowerCase().includes(searchTerm)
+                );
+
+                // Update statistics
+                updateJobStatistics(filteredJobs);
+
+                // Update table
+                if (!filteredJobs || filteredJobs.length === 0) {
+                    jobsTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="11" class="px-6 py-4 text-center text-gray-500">
+                                No jobs found
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                jobsTableBody.innerHTML = filteredJobs.map(job => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${job.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${job.owner_name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${job.location}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${job.type}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${job.required_experience}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${job.working_hours}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${job.salary}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${job.services.join(', ')}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${new Date(job.created_at).toLocaleDateString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${job.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${job.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <div class="flex space-x-2">
+                                <button onclick="viewJob('${job.id}')" class="text-blue-600 hover:text-blue-900">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button onclick="editJob('${job.id}')" class="text-yellow-600 hover:text-yellow-900">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="toggleJobStatus('${job.id}', ${!job.is_active})" class="text-${job.is_active ? 'red' : 'green'}-600 hover:text-${job.is_active ? 'red' : 'green'}-900">
+                                    <i class="fas fa-${job.is_active ? 'times' : 'check'}"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error in fetchJobs:', error);
+                const jobsTableBody = document.getElementById('jobs-table-body');
+                if (jobsTableBody) {
+                    jobsTableBody.innerHTML = '<tr><td colspan="11" class="px-6 py-4 text-center text-red-500">Error loading jobs</td></tr>';
+                }
+            }
+        }
+
+        function updateJobStatistics(jobs) {
+            const totalJobs = document.getElementById('total-jobs');
+            const activeJobs = document.getElementById('active-jobs');
+            const pendingJobs = document.getElementById('pending-jobs');
+
+            if (jobs) {
+                totalJobs.textContent = jobs.length;
+                activeJobs.textContent = jobs.filter(j => j.is_active).length;
+                pendingJobs.textContent = jobs.filter(j => !j.is_active).length;
+            }
+        }
+
+        // Function to show error message
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded';
+            errorDiv.role = 'alert';
+            errorDiv.innerHTML = `
+                <strong class="font-bold">Error!</strong>
+                <span class="block sm:inline">${message}</span>
+            `;
+            document.body.appendChild(errorDiv);
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        // Function to show success message
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded';
+            successDiv.role = 'alert';
+            successDiv.innerHTML = `
+                <strong class="font-bold">Success!</strong>
+                <span class="block sm:inline">${message}</span>
+            `;
+            document.body.appendChild(successDiv);
+            setTimeout(() => {
+                successDiv.remove();
+            }, 5000);
+        }
+
+        // Modal functions
+        function showJobModal(job = null) {
+            const modal = document.getElementById('job-modal');
+            const modalContentDiv = modal.querySelector('.inline-block');
+            const isEdit = !!job;
+
+            const modalContent = `
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                ${isEdit ? 'Edit Job' : 'Add New Job (Admin Created)'}
+                            </h3>
+                            <p class="mt-1 text-sm text-gray-500">
+                                This form is for creating jobs directly in the admin dashboard. For public job postings, use the "Post Job" button.
+                            </p>
+                            <form id="jobForm" class="mt-4 space-y-4">
+                                <div>
+                                    <label for="title" class="block text-sm font-medium text-gray-700">Job Title</label>
+                                    <input type="text" name="title" id="title" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                        value="${job?.title || ''}"
+                                        placeholder="Enter job title">
+                                </div>
+                                <div>
+                                    <label for="description" class="block text-sm font-medium text-gray-700">Job Description</label>
+                                    <textarea name="description" id="description" rows="3" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                        placeholder="Enter job description">${job?.description || ''}</textarea>
+                                </div>
+                                <div>
+                                    <label for="requirements" class="block text-sm font-medium text-gray-700">Requirements</label>
+                                    <textarea name="requirements" id="requirements" rows="3" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                        placeholder="Enter job requirements">${job?.requirements || ''}</textarea>
+                                </div>
+                                <div>
+                                    <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
+                                    <input type="text" name="location" id="location" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                        value="${job?.location || ''}"
+                                        placeholder="Enter job location">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="salary_min" class="block text-sm font-medium text-gray-700">Minimum Salary</label>
+                                        <input type="number" name="salary_min" id="salary_min" required
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                            value="${job?.salary_min || ''}"
+                                            placeholder="Enter minimum salary">
+                                    </div>
+                                    <div>
+                                        <label for="salary_max" class="block text-sm font-medium text-gray-700">Maximum Salary</label>
+                                        <input type="number" name="salary_max" id="salary_max" required
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm"
+                                            value="${job?.salary_max || ''}"
+                                            placeholder="Enter maximum salary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                                    <select name="status" id="status" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary sm:text-sm">
+                                        <option value="pending" ${job?.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                        <option value="active" ${job?.status === 'active' ? 'selected' : ''}>Active</option>
+                                        <option value="completed" ${job?.status === 'completed' ? 'selected' : ''}>Completed</option>
+                                        <option value="cancelled" ${job?.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-brand-primary text-base font-medium text-white hover:bg-brand-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary sm:ml-3 sm:w-auto sm:text-sm"
+                        onclick="saveJob(${job?.id || 'null'})">
+                        ${isEdit ? 'Update' : 'Create'}
+                    </button>
+                    <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        onclick="closeJobModal()">
+                        Cancel
+                    </button>
+                </div>
+            `;
+
+            modalContentDiv.innerHTML = modalContent;
+            modal.classList.remove('hidden');
+        }
+
+        async function saveJob(jobId) {
+            try {
+                const form = document.getElementById('jobForm');
+                const formData = new FormData(form);
+                const jobData = {
+                    owner_name: formData.get('title'),
+                    description: formData.get('description'),
+                    location: formData.get('location'),
+                    type: formData.get('type') || 'full-time',
+                    required_experience: formData.get('required_experience') || '1-3 years',
+                    working_hours: formData.get('working_hours') || '9 AM - 5 PM',
+                    salary: parseFloat(formData.get('salary_min')),
+                    services: ['cooking', 'cleaning'], // Default services
+                    contact_phone: formData.get('contact_phone') || 'Not provided',
+                    contact_email: formData.get('contact_email') || 'admin@citymaid.com',
+                    is_active: formData.get('status') === 'active'
+                };
+
+                let error;
+                if (jobId) {
+                    // Update existing job
+                    const { error: updateError } = await supabaseClient
+                        .from('jobs')
+                        .update(jobData)
+                        .eq('id', jobId);
+                    error = updateError;
+                } else {
+                    // Create new job
+                    const { error: insertError } = await supabaseClient
+                        .from('jobs')
+                        .insert([jobData]);
+                    error = insertError;
+                }
+
+                if (error) throw error;
+
+                showSuccessMessage(`Job ${jobId ? 'updated' : 'created'} successfully`);
+                closeJobModal();
+                await fetchJobs();
+
+            } catch (error) {
+                console.error('Error saving job:', error);
+                showErrorMessage(error.message);
+            }
+        }
+
+        function closeJobModal() {
+            const modal = document.getElementById('job-modal');
+            modal.classList.add('hidden');
+        }
+
+        // Job CRUD functions
+        async function viewJob(jobId) {
+            try {
+                console.log('Viewing job:', jobId);
+                const { data: job, error } = await supabaseClient
+                    .from('jobs')
+                    .select(`
+                        id,
+                        owner_name,
+                        location,
+                        type,
+                        required_experience,
+                        working_hours,
+                        salary,
+                        services,
+                        description,
+                        contact_phone,
+                        contact_email,
+                        created_at,
+                        is_active
+                    `)
+                    .eq('id', jobId)
+                    .single();
+
+                if (error) {
+                    console.error('Error fetching job details:', error);
+                    throw error;
+                }
+
+                console.log('Job details fetched:', job);
+
+                // Create modal content
+                const modalContent = `
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                    Job Details
+                                </h3>
+                                <div class="mt-4 space-y-4">
+                                    <div>
+                                        <h4 class="text-sm font-medium text-gray-500">Employer Details</h4>
+                                        <p class="mt-1 text-sm text-gray-900">${job.owner_name}</p>
+                                        <p class="mt-1 text-sm text-gray-900">${job.contact_email || 'N/A'}</p>
+                                        <p class="mt-1 text-sm text-gray-900">${job.contact_phone || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-medium text-gray-500">Job Details</h4>
+                                        <p class="mt-1 text-sm text-gray-900"><strong>Location:</strong> ${job.location}</p>
+                                        <p class="mt-1 text-sm text-gray-900"><strong>Type:</strong> ${job.type}</p>
+                                        <p class="mt-1 text-sm text-gray-900"><strong>Working Hours:</strong> ${job.working_hours}</p>
+                                        <p class="mt-1 text-sm text-gray-900"><strong>Salary:</strong> $${job.salary.toLocaleString()}</p>
+                                        <p class="mt-1 text-sm text-gray-900"><strong>Required Experience:</strong> ${job.required_experience}</p>
+                                        <p class="mt-1 text-sm text-gray-900"><strong>Status:</strong> ${job.is_active ? 'Active' : 'Inactive'}</p>
+                                        <p class="mt-1 text-sm text-gray-900"><strong>Posted:</strong> ${new Date(job.created_at).toLocaleDateString()}</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-medium text-gray-500">Description</h4>
+                                        <p class="mt-1 text-sm text-gray-900">${job.description || 'No description provided'}</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-medium text-gray-500">Required Services</h4>
+                                        <ul class="mt-1 text-sm text-gray-900 list-disc list-inside">
+                                            ${job.services && job.services.length > 0 
+                                                ? job.services.map(service => `<li>${service}</li>`).join('') 
+                                                : '<li>No specific services listed</li>'}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="closeJobModal()">
+                            Close
+                        </button>
+                    </div>
+                `;
+
+                // Show the modal
+                const modal = document.getElementById('job-modal');
+                const modalContentDiv = modal.querySelector('.inline-block');
+                modalContentDiv.innerHTML = modalContent;
+                modal.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error viewing job:', error);
+                showErrorMessage('Error viewing job details: ' + error.message);
+            }
+        }
+
+        async function editJob(jobId) {
+            try {
+                console.log('Editing job:', jobId);
+                const { data: job, error } = await supabaseClient
+                    .from('jobs')
+                    .select(`
+                        id,
+                        owner_name,
+                        location,
+                        type,
+                        required_experience,
+                        working_hours,
+                        salary,
+                        services,
+                        description,
+                        contact_phone,
+                        contact_email,
+                        is_active
+                    `)
+                    .eq('id', jobId)
+                    .single();
+
+                if (error) {
+                    console.error('Error fetching job details:', error);
+                    throw error;
+                }
+
+                console.log('Job details fetched for editing:', job);
+
+                // Show the modal with the job data
+                showJobModal(job);
+            } catch (error) {
+                console.error('Error editing job:', error);
+                showErrorMessage('Error loading job details: ' + error.message);
+            }
+        }
+
+        async function toggleJobStatus(jobId, newStatus) {
+            try {
+                console.log('Toggling job status:', jobId, 'to', newStatus);
+                const { error } = await supabaseClient
+                    .from('jobs')
+                    .update({ is_active: newStatus })
+                    .eq('id', jobId);
+
+                if (error) {
+                    console.error('Error toggling job status:', error);
+                    throw error;
+                }
+
+                showSuccessMessage(`Job status updated to ${newStatus ? 'active' : 'inactive'}`);
+                await fetchJobs();
+            } catch (error) {
+                console.error('Error toggling job status:', error);
+                showErrorMessage('Error updating job status: ' + error.message);
+            }
+        }
+
+        // CSV Export function
+        async function exportJobsToCSV() {
+            try {
+                // Fetch complete job data from Supabase
+                const { data: jobs, error } = await supabaseClient
+                    .from('jobs')
+                    .select(`
+                        id,
+                        owner_name,
+                        location,
+                        type,
+                        required_experience,
+                        working_hours,
+                        salary,
+                        services,
+                        description,
+                        contact_phone,
+                        contact_email,
+                        created_at,
+                        is_active
+                    `);
+
+                if (error) throw error;
+
+                // Create CSV headers
+                const headers = [
+                    'Job ID',
+                    'Owner Name',
+                    'Location',
+                    'Job Type',
+                    'Required Experience',
+                    'Working Hours',
+                    'Salary',
+                    'Services',
+                    'Description',
+                    'Contact Phone',
+                    'Contact Email',
+                    'Posted Date',
+                    'Status'
+                ];
+
+                // Create CSV rows
+                const rows = jobs.map(job => [
+                    job.id,
+                    job.owner_name,
+                    job.location,
+                    job.type,
+                    job.required_experience,
+                    job.working_hours,
+                    job.salary,
+                    job.services.join('; '),
+                    job.description,
+                    job.contact_phone,
+                    job.contact_email,
+                    new Date(job.created_at).toLocaleDateString(),
+                    job.is_active ? 'Active' : 'Inactive'
+                ]);
+
+                // Combine headers and rows
+                const csvContent = [
+                    headers.join(','),
+                    ...rows.map(row => row.map(cell => {
+                        // Escape quotes and wrap in quotes if contains comma or newline
+                        const cellStr = String(cell || '');
+                        if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+                            return `"${cellStr.replace(/"/g, '""')}"`;
+                        }
+                        return cellStr;
+                    }).join(','))
+                ].join('\n');
+
+                // Create and download the file
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `jobs_export_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+                
+                showSuccessMessage('Jobs exported to CSV successfully');
+            } catch (error) {
+                console.error('Error exporting jobs to CSV:', error);
+                showErrorMessage('Error exporting jobs to CSV: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html> 

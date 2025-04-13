@@ -83,7 +83,7 @@
             padding-left: 2.5rem;
         }
         
-        /* Enhanced profile image styles */
+        /* Basic profile image styles */
         .profile-image-container {
             position: relative;
             width: 96px;
@@ -102,26 +102,6 @@
             transform: scale(1.05);
         }
         
-        .profile-image-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .profile-image-container:hover .profile-image-overlay {
-            opacity: 1;
-        }
-        
-        .profile-image-icon {
-            color: white;
-            font-size: 1.5rem;
-        }
-        
         .profile-image-upload-text {
             font-size: 0.875rem;
             color: #4B5563;
@@ -137,6 +117,7 @@
             border-radius: 0.5rem;
             font-weight: 500;
             transition: background-color 0.3s ease;
+            cursor: pointer;
         }
         
         .profile-image-upload-button:hover {
@@ -147,44 +128,11 @@
             margin-right: 0.5rem;
         }
         
-        .profile-image-loading {
-            position: absolute;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-        
-        .profile-image-loading.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        
-        .profile-image-success {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            width: 1.5rem;
-            height: 1.5rem;
-            background-color: #10B981;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.75rem;
-            opacity: 0;
-            transform: scale(0);
+        #imagePreview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             transition: all 0.3s ease;
-        }
-        
-        .profile-image-success.active {
-            opacity: 1;
-            transform: scale(1);
         }
     </style>
 </head>
@@ -239,25 +187,16 @@
                                     <img id="imagePreview" src="https://placehold.co/300x300/eee/aaa?text=No+Image" 
                                          alt="Profile preview" 
                                          class="w-full h-full object-cover">
-                                    <div class="profile-image-overlay" id="imageUploadOverlay">
-                                        <i class="fas fa-camera profile-image-icon"></i>
-                                    </div>
-                                    <div class="profile-image-loading" id="imageLoading">
-                                        <i class="fas fa-spinner fa-spin text-brand-primary text-xl"></i>
-                                    </div>
-                                    <div class="profile-image-success" id="imageSuccess">
-                                        <i class="fas fa-check"></i>
-                                    </div>
                                 </div>
                                 <div>
-                                    <label for="profileImage" class="profile-image-upload-button">
+                                    <button type="button" id="uploadButton" class="profile-image-upload-button">
                                         <i class="fas fa-upload"></i>Upload Image
-                                    </label>
-                                    <input type="file" id="profileImage" name="profileImage" accept="image/jpeg,image/png" class="hidden">
+                                    </button>
                                     <p class="profile-image-upload-text">Recommended: Square image, max 2MB</p>
                                     <p id="imageError" class="mt-1 text-sm text-red-500 hidden"></p>
                                 </div>
                             </div>
+                            <input type="file" id="profileImage" name="profileImage" accept="image/jpeg,image/png" class="hidden">
                         </div>
 
                         <!-- Personal Information -->
@@ -445,386 +384,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
-    <script>
-        // Set current year in footer
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-        
-        // Initialize Supabase
-        const supabaseUrl = 'https://fdgqqxyyofjnkhswkwcq.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZ3FxeHl5b2Zqbmtoc3drd2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMjQyMTMsImV4cCI6MjA1OTYwMDIxM30.YyJLLu3r2a7Mh7ny0ie-YzzLfPh5PdrJJHnBFBxWqVE';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('profileForm');
-            const submitButton = document.getElementById('submitButton');
-            const submitButtonText = document.getElementById('submitButtonText');
-            const submitButtonLoading = document.getElementById('submitButtonLoading');
-            const progressBar = document.getElementById('progressBar');
-            const completionPercentage = document.getElementById('completionPercentage');
-            
-            // Form validation functions
-            function showValidationMessage(elementId, message, isError = true) {
-                const element = document.getElementById(elementId);
-                element.textContent = message;
-                element.classList.remove('error', 'success');
-                element.classList.add(isError ? 'error' : 'success');
-            }
-            
-            function clearValidationMessages() {
-                const validationElements = document.querySelectorAll('.validation-message');
-                validationElements.forEach(element => {
-                    element.textContent = '';
-                    element.classList.remove('error', 'success');
-                });
-            }
-            
-            function isValidEmail(email) {
-                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-            }
-            
-            function isValidPhone(phone) {
-                // Simplified phone validation - just check if it contains at least 10 digits
-                const digitsOnly = phone.replace(/\D/g, '');
-                return digitsOnly.length >= 10;
-            }
-            
-            function updateProgressBar() {
-                const requiredFields = [
-                    'fullName', 'age', 'location', 'workType', 'workingHours', 
-                    'expectedSalary', 'experience', 'description', 'phone'
-                ];
-                
-                const servicesCheckboxes = document.querySelectorAll('input[name="services"]');
-                let servicesSelected = false;
-                servicesCheckboxes.forEach(checkbox => {
-                    if (checkbox.checked) servicesSelected = true;
-                });
-                
-                let completedFields = 0;
-                
-                requiredFields.forEach(fieldId => {
-                    const field = document.getElementById(fieldId);
-                    if (field && field.value.trim() !== '') {
-                        completedFields++;
-                    }
-                });
-                
-                if (servicesSelected) completedFields++;
-                
-                const percentage = Math.round((completedFields / (requiredFields.length + 1)) * 100);
-                progressBar.style.width = `${percentage}%`;
-                completionPercentage.textContent = `${percentage}%`;
-                
-                // Change color based on completion
-                if (percentage < 30) {
-                    progressBar.classList.remove('bg-green-500', 'bg-yellow-500', 'bg-brand-primary');
-                    progressBar.classList.add('bg-red-500');
-                } else if (percentage < 70) {
-                    progressBar.classList.remove('bg-red-500', 'bg-green-500', 'bg-brand-primary');
-                    progressBar.classList.add('bg-yellow-500');
-                } else {
-                    progressBar.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-brand-primary');
-                    progressBar.classList.add('bg-green-500');
-                }
-            }
-            
-            // Add input event listeners to update progress
-            const formInputs = form.querySelectorAll('input, select, textarea');
-            formInputs.forEach(input => {
-                input.addEventListener('input', updateProgressBar);
-                input.addEventListener('change', updateProgressBar);
-            });
-            
-            // Initialize progress bar
-            updateProgressBar();
-            
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                
-                // Clear previous validation messages
-                clearValidationMessages();
-                
-                // Get form elements
-                const fullNameInput = document.getElementById('fullName');
-                const ageInput = document.getElementById('age');
-                const locationInput = document.getElementById('location');
-                const workTypeInput = document.getElementById('workType');
-                const workingHoursInput = document.getElementById('workingHours');
-                const expectedSalaryInput = document.getElementById('expectedSalary');
-                const experienceInput = document.getElementById('experience');
-                const descriptionInput = document.getElementById('description');
-                const phoneInput = document.getElementById('phone');
-                const emailInput = document.getElementById('email');
-                const servicesCheckboxes = document.querySelectorAll('input[name="services"]');
-                const profileImageInput = document.getElementById('profileImage');
-                
-                // Validate form fields
-                let isValid = true;
-                
-                if (fullNameInput.value.trim() === '') {
-                    showValidationMessage('fullNameValidation', 'Full name is required');
-                    isValid = false;
-                }
-                
-                const age = parseInt(ageInput.value);
-                if (isNaN(age) || age < 18 || age > 60) {
-                    showValidationMessage('ageValidation', 'Age must be between 18 and 60');
-                    isValid = false;
-                }
-                
-                if (locationInput.value.trim() === '') {
-                    showValidationMessage('locationValidation', 'Location is required');
-                    isValid = false;
-                }
-                
-                if (workTypeInput.value === '') {
-                    showValidationMessage('workTypeValidation', 'Work type is required');
-                    isValid = false;
-                }
-                
-                if (workingHoursInput.value.trim() === '') {
-                    showValidationMessage('workingHoursValidation', 'Working hours are required');
-                    isValid = false;
-                }
-                
-                const salary = parseInt(expectedSalaryInput.value);
-                if (isNaN(salary) || salary < 5000) {
-                    showValidationMessage('expectedSalaryValidation', 'Salary must be at least 5,000 NPR');
-                    isValid = false;
-                }
-                
-                if (experienceInput.value === '') {
-                    showValidationMessage('experienceValidation', 'Experience is required');
-                    isValid = false;
-                }
-                
-                let servicesSelected = false;
-                servicesCheckboxes.forEach(checkbox => {
-                    if (checkbox.checked) servicesSelected = true;
-                });
-                
-                if (!servicesSelected) {
-                    showValidationMessage('servicesValidation', 'Please select at least one service');
-                    isValid = false;
-                }
-                
-                if (descriptionInput.value.trim() === '') {
-                    showValidationMessage('descriptionValidation', 'Description is required');
-                    isValid = false;
-                }
-                
-                if (phoneInput.value.trim() === '') {
-                    showValidationMessage('phoneValidation', 'Phone number is required');
-                    isValid = false;
-                } else if (!isValidPhone(phoneInput.value.trim())) {
-                    showValidationMessage('phoneValidation', 'Please enter a valid phone number with at least 10 digits');
-                    isValid = false;
-                }
-                
-                if (emailInput.value.trim() !== '' && !isValidEmail(emailInput.value.trim())) {
-                    showValidationMessage('emailValidation', 'Please enter a valid email address');
-                    isValid = false;
-                }
-                
-                if (!isValid) {
-                    return;
-                }
-                
-                // Get selected services
-                const selectedServices = [];
-                servicesCheckboxes.forEach(checkbox => {
-                    if (checkbox.checked) selectedServices.push(checkbox.value);
-                });
-                
-                // Show loading state
-                submitButtonText.classList.add('hidden');
-                submitButtonLoading.classList.remove('hidden');
-                submitButton.disabled = true;
-                
-                try {
-                    // Handle profile image upload
-                    let imageUrl = null;
-                    if (profileImageInput.files.length > 0) {
-                        const file = profileImageInput.files[0];
-                        
-                        // Upload to Supabase Storage
-                        const fileExt = file.name.split('.').pop();
-                        const fileName = `${Math.random()}.${fileExt}`;
-                        const { data: uploadData, error: uploadError } = await supabase.storage
-                            .from('profile-images')
-                            .upload(fileName, file);
-                            
-                        if (uploadError) throw uploadError;
-                        
-                        // Get public URL
-                        const { data: { publicUrl } } = supabase.storage
-                            .from('profile-images')
-                            .getPublicUrl(fileName);
-                            
-                        imageUrl = publicUrl;
-                    }
-                    
-                    // Prepare profile data
-                    const profileData = {
-                        full_name: fullNameInput.value.trim(),
-                        age: parseInt(ageInput.value),
-                        location: locationInput.value.trim(),
-                        type: workTypeInput.value,
-                        working_hours: workingHoursInput.value.trim(),
-                        expected_salary: parseInt(expectedSalaryInput.value),
-                        experience: experienceInput.value,
-                        services: selectedServices,
-                        description: descriptionInput.value.trim(),
-                        contact_phone: phoneInput.value.trim(),
-                        contact_email: emailInput.value.trim(),
-                        profile_image: imageUrl,
-                        is_active: true,
-                        created_at: new Date().toISOString()
-                    };
-                    
-                    // Submit to Supabase
-                    const { data, error } = await supabase
-                        .from('maids')
-                        .insert([profileData]);
-                    
-                    if (error) throw error;
-                    
-                    // Reset form
-                    form.reset();
-                    
-                    // Create success message modal
-                    const successModal = document.createElement('div');
-                    successModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-                    successModal.innerHTML = `
-                        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 text-center">
-                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-check text-3xl text-green-500"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Profile Created!</h3>
-                            <p class="text-gray-600 mb-6">Your domestic helper profile is now live and visible to potential employers.</p>
-                            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                                <a href="../index.html" class="bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary transition-colors">
-                                    <i class="fas fa-home mr-2"></i>Go to Homepage
-                                </a>
-                                <a href="../jobs/find-maids.html" class="bg-white text-brand-primary px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors border-2 border-brand-primary">
-                                    <i class="fas fa-search mr-2"></i>View All Profiles
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                    document.body.appendChild(successModal);
-                    
-                } catch (error) {
-                    console.error('Error:', error);
-                    
-                    // Create error message modal
-                    const errorModal = document.createElement('div');
-                    errorModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-                    errorModal.innerHTML = `
-                        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 text-center">
-                            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-exclamation-circle text-3xl text-red-500"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Error Creating Profile</h3>
-                            <p class="text-gray-600 mb-6">${error.message}</p>
-                            <button onclick="this.closest('.fixed').remove()" class="bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-secondary transition-colors">
-                                <i class="fas fa-times mr-2"></i>Close
-                            </button>
-                        </div>
-                    `;
-                    document.body.appendChild(errorModal);
-                } finally {
-                    // Reset button state
-                    submitButtonText.classList.remove('hidden');
-                    submitButtonLoading.classList.add('hidden');
-                    submitButton.disabled = false;
-                }
-            });
-        });
-
-        // Initialize character count for description
-        const descriptionInput = document.getElementById('description');
-        const descriptionCharCount = document.getElementById('descriptionCharCount');
-        
-        function updateDescriptionCharCount() {
-            const count = descriptionInput.value.length;
-            descriptionCharCount.textContent = count;
-            
-            // Change color based on character count
-            if (count > 180) {
-                descriptionCharCount.classList.add('text-red-500');
-                descriptionCharCount.classList.remove('text-gray-500');
-            } else {
-                descriptionCharCount.classList.remove('text-red-500');
-                descriptionCharCount.classList.add('text-gray-500');
-            }
-        }
-        
-        descriptionInput.addEventListener('input', updateDescriptionCharCount);
-        updateDescriptionCharCount(); // Initialize count on page load
-
-        // Enhanced image upload functionality
-        const profileImageInput = document.getElementById('profileImage');
-        const imagePreview = document.getElementById('imagePreview');
-        const imageError = document.getElementById('imageError');
-        const imageUploadOverlay = document.getElementById('imageUploadOverlay');
-        const profileImageContainer = document.getElementById('profileImageContainer');
-        const imageLoading = document.getElementById('imageLoading');
-        const imageSuccess = document.getElementById('imageSuccess');
-        
-        profileImageInput.addEventListener('change', function() {
-            const file = this.files[0];
-            imageError.classList.add('hidden');
-            imageSuccess.classList.remove('active');
-            
-            if (file) {
-                // Show loading state
-                imageLoading.classList.add('active');
-                
-                // Check file size (max 2MB)
-                if (file.size > 2 * 1024 * 1024) {
-                    imageError.textContent = 'Image size must be less than 2MB';
-                    imageError.classList.remove('hidden');
-                    this.value = ''; // Clear the input
-                    imageLoading.classList.remove('active');
-                    return;
-                }
-                
-                // Check file type
-                if (!['image/jpeg', 'image/png'].includes(file.type)) {
-                    imageError.textContent = 'Only JPG and PNG images are allowed';
-                    imageError.classList.remove('hidden');
-                    this.value = ''; // Clear the input
-                    imageLoading.classList.remove('active');
-                    return;
-                }
-                
-                // Show preview
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    imageUploadOverlay.classList.remove('opacity-0');
-                    
-                    // Simulate upload delay for better UX
-                    setTimeout(() => {
-                        imageLoading.classList.remove('active');
-                        imageSuccess.classList.add('active');
-                        
-                        // Hide success indicator after 3 seconds
-                        setTimeout(() => {
-                            imageSuccess.classList.remove('active');
-                        }, 3000);
-                    }, 1000);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-        
-        // Allow clicking on the image to trigger file input
-        profileImageContainer.addEventListener('click', function() {
-            profileImageInput.click();
-        });
-    </script>
+    <script src="create-profile.js"></script>
     
     <!-- Footer -->
     <footer class="bg-gray-900 text-white mt-20">

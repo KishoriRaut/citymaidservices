@@ -152,23 +152,6 @@
                 <p class="mt-6 text-lg text-gray-600">
                     Discover experienced and verified domestic helpers ready to assist you
                 </p>
-                <div class="mt-4 flex flex-wrap justify-center gap-4">
-                    <div class="bg-brand-light px-4 py-2 rounded-lg">
-                        <span class="text-brand-primary font-semibold" id="cookCount">-</span> Cooks
-                    </div>
-                    <div class="bg-brand-light px-4 py-2 rounded-lg">
-                        <span class="text-brand-primary font-semibold" id="cleanerCount">-</span> Cleaners
-                    </div>
-                    <div class="bg-brand-light px-4 py-2 rounded-lg">
-                        <span class="text-brand-primary font-semibold" id="childcareCount">-</span> Childcare
-                    </div>
-                    <div class="bg-brand-light px-4 py-2 rounded-lg">
-                        <span class="text-brand-primary font-semibold" id="elderlyCount">-</span> Elderly Care
-                    </div>
-                    <div class="bg-brand-light px-4 py-2 rounded-lg">
-                        <span class="text-brand-primary font-semibold" id="otherCount">-</span> Other Services
-                    </div>
-                </div>
             </div>
             <div id="latestMaidsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Loading placeholder -->
@@ -194,23 +177,6 @@
                 <p class="mt-6 text-lg text-gray-600">
                     Find your perfect domestic helper position with top employers
                 </p>
-                <div class="mt-4 flex flex-wrap justify-center gap-4">
-                    <div class="bg-brand-light px-4 py-2 rounded-lg">
-                        <span class="text-brand-primary font-semibold" id="cookJobsCount">-</span> Cook Jobs
-                    </div>
-                    <div class="bg-brand-light px-4 py-2 rounded-lg">
-                        <span class="text-brand-primary font-semibold" id="cleanerJobsCount">-</span> Cleaner Jobs
-                    </div>
-                    <div class="bg-brand-light px-4 py-2 rounded-lg">
-                        <span class="text-brand-primary font-semibold" id="childcareJobsCount">-</span> Childcare Jobs
-                    </div>
-                    <div class="bg-brand-light px-4 py-2 rounded-lg">
-                        <span class="text-brand-primary font-semibold" id="elderlyJobsCount">-</span> Elderly Care Jobs
-                    </div>
-                    <div class="bg-brand-light px-4 py-2 rounded-lg">
-                        <span class="text-brand-primary font-semibold" id="otherJobsCount">-</span> Other Jobs
-                    </div>
-                </div>
             </div>
             <div id="latestJobsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Loading placeholder -->
@@ -692,6 +658,59 @@
                     toggleMobileMenu();
                 }
             });
+        });
+
+        // Function to update navigation based on auth status
+        async function updateNavigation() {
+            const { data: { session } } = await supabase.auth.getSession();
+            const desktopSignInBtn = document.querySelector('.md\\:flex a[href="auth/signin.html"]');
+            const mobileSignInBtn = document.querySelector('#mobileMenu a[href="auth/signin.html"]');
+            
+            if (session) {
+                // User is signed in
+                if (desktopSignInBtn) {
+                    desktopSignInBtn.innerHTML = '<i class="fas fa-sign-out-alt mr-2"></i>Sign Out';
+                    desktopSignInBtn.onclick = async (e) => {
+                        e.preventDefault();
+                        const { error } = await supabase.auth.signOut();
+                        if (error) {
+                            console.error('Error signing out:', error);
+                        } else {
+                            window.location.reload();
+                        }
+                    };
+                }
+                if (mobileSignInBtn) {
+                    mobileSignInBtn.innerHTML = '<i class="fas fa-sign-out-alt mr-2"></i>Sign Out';
+                    mobileSignInBtn.onclick = async (e) => {
+                        e.preventDefault();
+                        const { error } = await supabase.auth.signOut();
+                        if (error) {
+                            console.error('Error signing out:', error);
+                        } else {
+                            window.location.reload();
+                        }
+                    };
+                }
+            } else {
+                // User is signed out
+                if (desktopSignInBtn) {
+                    desktopSignInBtn.innerHTML = 'Sign In';
+                    desktopSignInBtn.onclick = null;
+                }
+                if (mobileSignInBtn) {
+                    mobileSignInBtn.innerHTML = 'Sign In';
+                    mobileSignInBtn.onclick = null;
+                }
+            }
+        }
+
+        // Update navigation on page load
+        document.addEventListener('DOMContentLoaded', updateNavigation);
+
+        // Update navigation when auth state changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            updateNavigation();
         });
     </script>
 </body>
