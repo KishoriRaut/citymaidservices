@@ -129,5 +129,42 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 For any queries or support, please contact:
 - Email: info@citymaid.com
 - Phone: +977-1-4XXXXXX
-- Address: 123 Main Street, Kathmandu, Nepal 
+- Address: 123 Main Street, Kathmandu, Nepal
+
+# City Maid Admin Dashboard
+
+This is the admin dashboard for the City Maid platform, a service that connects domestic helpers with employers in Nepal.
+
+## Features
+
+- Settings management
+- User management
+- Payment tracking
+- Contact unlock management
+- System configuration
+
+## Getting Started
+
+1. Clone the repository
+2. Open `pages/dashboard/admin/settings.html` in your browser
+3. Sign in with admin credentials
+
+## Technology Stack
+
+- HTML5
+- Tailwind CSS
+- JavaScript
+- Supabase for backend
+- Khalti for payments
+
+## Security
+
+- Admin authentication required
+- Secure payment processing
+- Data encryption
+- Regular security audits
+
+## License
+
+All rights reserved. This is a private repository. 
  
